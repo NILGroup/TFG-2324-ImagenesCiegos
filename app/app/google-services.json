@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "510735990775",
+    "project_id": "tfg23-24",
+    "storage_bucket": "tfg23-24.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:510735990775:android:7d44b582180b223009b8f2",
+        "android_client_info": {
+          "package_name": "com.android.tfgapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMD4-LdYaO_4luYdpc8Y7goilJrS1exlI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
