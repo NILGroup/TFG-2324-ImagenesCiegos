@@ -11,10 +11,10 @@ const {onRequest} = require("firebase-functions/v2/https");
 const logger = require("firebase-functions/logger");
 const { onCall } = require("firebase-functions/v1/https");
 
-const fs = require('fs');
+const fetch = require('node-fetch'); // Assuming you're running this in a Node.js environment
 
 async function query(filename) {
-	const data = fs.readFileSync(url);
+	const data = fs.readFileSync(filename);
 	const response = await fetch(
 		"https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-large",
 		{
@@ -39,7 +39,7 @@ exports.descripImagen = onCall((data, response) => {
    console.log("Funcion de prueba CONECTADA");
    var red = "";
    query(data.url).then((response) => {
-      red+= "ret" + JSON.stringify(response);
+      red+= JSON.stringify(response);
    });
    return red;
  });

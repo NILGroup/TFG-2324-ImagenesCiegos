@@ -41,6 +41,10 @@ import com.google.firebase.database.DatabaseReference;
 
 import org.checkerframework.checker.units.qual.C;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -166,7 +170,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //funcion que llama a la cloud function
-    private Task<String> callImagen(String name){
+    private Task<String> callImagen(Uri name) throws IOException {
+
+        byte[] imageBytes = Files.readAllBytes(Paths.get(getPathFromUri(name)));
+        String base64Image = Base64.getEncoder().encodeToString(imageBytes);
         Map<String,Object> data = new HashMap<>();
         data.put("url",name);
 
@@ -191,12 +198,16 @@ public class MainActivity extends AppCompatActivity {
                         Model model = new Model(uri.toString());
                         String modelId = root.push().getKey();
                         root.child(modelId).setValue(model);
-                        callImagen(uri.toString()).addOnCompleteListener(new OnCompleteListener<String>() {
-                            @Override
-                            public void onComplete(@NonNull Task<String> task) {
-                                awita.setText(task.getResult());
-                            }
-                        });
+                        try {
+                            callImagen(uri).addOnCompleteListener(new OnCompleteListener<String>() {
+                                @Override
+                                public void onComplete(@NonNull Task<String> task) {
+                                    awita.setText(task.getResult());
+                                }
+                            });
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                 });
             }
@@ -207,5 +218,16 @@ public class MainActivity extends AppCompatActivity {
         ContentResolver cr = getContentResolver();
         MimeTypeMap mime = MimeTypeMap.getSingleton();
         return mime.getExtensionFromMimeType(cr.getType(muri));
+    }
+
+    private String getPathFromUri(Uri uri) {
+        // Este método convierte la URI a la ruta real del archivo
+        // Puedes implementar esta lógica según tus necesidades específicas
+        // Aquí hay un ejemplo básico utilizando la clase Cursor
+        String[] projection = {MediaStore.Images.Media.DATA};
+        android.database.Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        return cursor.getString(column_index);
     }
 }
