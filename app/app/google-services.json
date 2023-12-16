@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:510735990775:android:7d44b582180b223009b8f2",
+        "mobilesdk_app_id": "1:510735990775:android:0e16af7b32d1f8c609b8f2",
         "android_client_info": {
-          "package_name": "com.android.tfgapp"
+          "package_name": "com.android.app"
         }
       },
       "oauth_client": [],

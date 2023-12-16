@@ -33,11 +33,11 @@
 
     <TextView
         android:id="@+id/awita"
-        android:layout_width="408dp"
-        android:layout_height="108dp"
+        android:layout_width="384dp"
+        android:layout_height="107dp"
         android:text="La imagen esta arriba"
-        android:textSize="25dp"
         android:textColor="@color/black"
+        android:textSize="25dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
