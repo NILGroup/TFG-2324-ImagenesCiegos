@@ -84,7 +84,12 @@ public class MainActivity extends AppCompatActivity {
                             Bitmap photo=(Bitmap) data.getExtras().get("data");
                             ivPicture.setImageBitmap(photo);
                             imageUri = data.getData();
-                            uploadPicture(imageUri);
+                            callImagen(imageUri.toString()).addOnCompleteListener(new OnCompleteListener<String>() {
+                                @Override
+                                public void onComplete(@NonNull Task<String> task) {
+                                    awita.setText(task.getResult());
+                                }
+                            });
                         }catch (Exception e){
                             Log.d(TAG,"onActivityResult:"+ e.getMessage());
                         }
@@ -101,7 +106,12 @@ public class MainActivity extends AppCompatActivity {
                         try {
                             ivPicture.setImageURI(data.getData());
                             imageUri = data.getData();
-                            uploadPicture(imageUri);
+                            callImagen(imageUri.toString()).addOnCompleteListener(new OnCompleteListener<String>() {
+                                @Override
+                                public void onComplete(@NonNull Task<String> task) {
+                                    awita.setText(task.getResult());
+                                }
+                            });
                         }catch (Exception e){
                             Log.d(TAG,"onActivityResult:"+ e.getMessage());
                         }
@@ -144,29 +154,31 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission},requestCode);
         }
     }
-    public void onRequestPermissionsResult(int requestCode,@NonNull String[] permissions,@NonNull int[] grantResults) {
+    /*public void onRequestPermissionsResult(int requestCode,@NonNull String[] permissions,@NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == CAMERA_PERMISSION_CODE) {
             if (!(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                Toast.makeText(MainActivity.this, "Permiso de cámara denegado", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Permiso de cámara denegado1", Toast.LENGTH_SHORT).show();
             } else {
                 CheckPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE, READ_STORAGE_PERMISSION_CODE);
             }
         } else if (requestCode == READ_STORAGE_PERMISSION_CODE) {
             if (!(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                Toast.makeText(MainActivity.this, "Permiso de cámara denegado", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Permiso de cámara denegado2", Toast.LENGTH_SHORT).show();
             } else {
                 CheckPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, WRITE_STORAGE_PERMISSION_CODE);
             }
         } else if (requestCode == WRITE_STORAGE_PERMISSION_CODE) {
             if (!(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                Toast.makeText(MainActivity.this, "Permiso de cámara denegado", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Permiso de cámara denegado3", Toast.LENGTH_SHORT).show();
             }
         }
-    }
+    }*/
 
     //funcion que llama a la cloud function
     private Task<String> callImagen(String name){
+
+        
         Map<String,Object> data = new HashMap<>();
         data.put("url",name);
 
@@ -178,29 +190,6 @@ public class MainActivity extends AppCompatActivity {
                         return (String) task.getResult().getData();
                     }
                 });
-    }
-
-    private void uploadPicture(Uri uri){
-        StorageReference fileRef = storageReference.child(System.currentTimeMillis()+ "."+ getFileextension(uri));
-        fileRef.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                fileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        Model model = new Model(uri.toString());
-                        String modelId = root.push().getKey();
-                        root.child(modelId).setValue(model);
-                        callImagen(uri.toString()).addOnCompleteListener(new OnCompleteListener<String>() {
-                            @Override
-                            public void onComplete(@NonNull Task<String> task) {
-                                awita.setText(task.getResult());
-                            }
-                        });
-                    }
-                });
-            }
-        });
     }
 
     private String getFileextension(Uri muri){
