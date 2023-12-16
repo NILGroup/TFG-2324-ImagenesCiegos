@@ -41,6 +41,12 @@ import com.google.firebase.database.DatabaseReference;
 
 import org.checkerframework.checker.units.qual.C;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -143,7 +149,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -176,9 +181,8 @@ public class MainActivity extends AppCompatActivity {
     }*/
 
     //funcion que llama a la cloud function
-    private Task<String> callImagen(String name){
+    private Task<String> callImagen(String name) throws IOException {
 
-        
         Map<String,Object> data = new HashMap<>();
         data.put("url",name);
 
