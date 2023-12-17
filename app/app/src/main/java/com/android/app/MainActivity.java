@@ -9,13 +9,13 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -41,6 +41,7 @@ import com.google.firebase.database.DatabaseReference;
 
 import org.checkerframework.checker.units.qual.C;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -112,7 +113,9 @@ public class MainActivity extends AppCompatActivity {
                         try {
                             ivPicture.setImageURI(data.getData());
                             imageUri = data.getData();
-                            callImagen(imageUri.toString()).addOnCompleteListener(new OnCompleteListener<String>() {
+
+                            String texto = codificar(imageUri);
+                            callImagen(texto).addOnCompleteListener(new OnCompleteListener<String>() {
                                 @Override
                                 public void onComplete(@NonNull Task<String> task) {
                                     awita.setText(task.getResult());
@@ -149,6 +152,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    private String codificar(Uri uri) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        InputStream inputStream = getContentResolver().openInputStream(uri);
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+        while ((bytesRead = inputStream.read(buffer)) != -1) {
+            byteArrayOutputStream.write(buffer, 0, bytesRead);
+        }
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+
+        // Convertir el array de bytes a base64
+        String base64Image = Base64.getEncoder().encodeToString(byteArray);
+        return base64Image;
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
