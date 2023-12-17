@@ -118,7 +118,17 @@ public class MainActivity extends AppCompatActivity {
                             callImagen(texto).addOnCompleteListener(new OnCompleteListener<String>() {
                                 @Override
                                 public void onComplete(@NonNull Task<String> task) {
-                                    awita.setText(task.getResult());
+                                    try {
+                                        translatedImagen(task.getResult()).addOnCompleteListener(new OnCompleteListener<String>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<String> task2) {
+                                                String texto = task2.getResult();
+                                                awita.setText(task2.getResult());
+                                            }
+                                        });
+                                    } catch (IOException e) {
+                                        throw new RuntimeException(e);
+                                    }
                                 }
                             });
                         }catch (Exception e){
@@ -206,6 +216,20 @@ public class MainActivity extends AppCompatActivity {
         data.put("url",name);
 
         return fFunc.getHttpsCallable("descripImagen")
+                .call(data)
+                .continueWith(new Continuation<HttpsCallableResult, String>() {
+                    @Override
+                    public String then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                        return (String) task.getResult().getData();
+                    }
+                });
+    }
+    private Task<String> translatedImagen(String name) throws IOException {
+
+        Map<String,Object> data = new HashMap<>();
+        data.put("texto",name);
+
+        return fFunc.getHttpsCallable("traducDescrip")
                 .call(data)
                 .continueWith(new Continuation<HttpsCallableResult, String>() {
                     @Override
