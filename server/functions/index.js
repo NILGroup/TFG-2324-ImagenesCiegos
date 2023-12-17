@@ -17,7 +17,7 @@ async function descriptor(data) {
 	return result;
 }
 
-async function translator(data) {
+async function query(data) {
 	const response = await fetch(
 		"https://api-inference.huggingface.co/models/Helsinki-NLP/opus-mt-en-es",
 		{
@@ -33,9 +33,16 @@ async function translator(data) {
 exports.descripImagen = onCall((data, response) => {
 	console.log("Función de analisis conectada");
 	const base64 = data.url;
-	const buffer  = Buffer.from(base64,'base64');	
+	const buffer  = Buffer.from(base64,'base64');
 
-	return descrip(buffer).then((response) => {
+	return descriptor(buffer).then((response) => {
+		return JSON.stringify(response);
+	});
+ });
+
+ exports.traducDescrip = onCall((data, response) => {
+	console.log("Función de traduccion conectada");
+	return query({"inputs": data.texto}).then((response) => {
 		return JSON.stringify(response);
 	});
  });
