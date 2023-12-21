@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -27,6 +28,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.Rotate;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -114,7 +118,8 @@ public class MainActivity extends AppCompatActivity {
                     public void onActivityResult(ActivityResult result) {
                         Intent data = result.getData();
                         try {
-                            ivPicture.setImageURI(data.getData());
+                            rotarImagen(data);//Rota si es necesario y muestra la imagen
+                            //ivPicture.setImageURI(data.getData());
                             imageUri = data.getData();
 
                             String texto = codificar(imageUri);
@@ -165,6 +170,31 @@ public class MainActivity extends AppCompatActivity {
                 builder.show();
             }
         });
+    }
+
+
+
+    private void rotarImagen(Intent data) throws IOException {
+        if(sacarRelacion(data))
+            Glide.with(getApplicationContext())
+                    .load(data.getData())
+                    .apply(new RequestOptions().transform(new Rotate(90))) // Rotación de 90 grados
+                    .into(ivPicture);
+        else
+            ivPicture.setImageURI(data.getData());
+    }
+
+    private boolean sacarRelacion(Intent data) throws IOException { //Ve si una imagen tiene que ir en vertical o en horizontal
+        ImageDecoder.Source source = ImageDecoder.createSource(this.getContentResolver(), data.getData());
+        Bitmap bitmap = ImageDecoder.decodeBitmap(source);
+        int imageHeight= bitmap.getHeight();
+        int imageWidth = bitmap.getWidth();
+        int ratio = imageHeight/imageWidth;
+        if(ratio >= 1){
+            return false;
+        }else{
+            return true;
+        }
     }
 
     private String codificar(Uri uri) throws IOException {
