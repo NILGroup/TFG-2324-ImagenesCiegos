@@ -10,55 +10,39 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import android.Manifest;
-import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
-import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.Rotate;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.google.firebase.database.DatabaseReference;
 
-import org.checkerframework.checker.units.qual.C;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -71,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     TextView tvResult;
     TextView awita;
     Button btnChoosePicture;
+    Button decirDescripcion;
 
     private static final int CAMERA_PERMISSION_CODE = 223;
     private static final int READ_STORAGE_PERMISSION_CODE = 144;
@@ -79,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
     ActivityResultLauncher<Intent> cameraLauncher;
     ActivityResultLauncher<Intent> galleryLauncher;
+     String textToSpeech;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +73,9 @@ public class MainActivity extends AppCompatActivity {
 
         ivPicture = findViewById(R.id.ivPicture);
         tvResult = findViewById(R.id.tvResult);
+        decirDescripcion = findViewById(R.id.decirDescripcion);
         awita = findViewById(R.id.awita);
+
         btnChoosePicture = findViewById(R.id.btnChoosePicture);
         cameraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
                     @Override
@@ -100,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
                             callImagen(imageUri.toString()).addOnCompleteListener(new OnCompleteListener<String>() {
                                 @Override
                                 public void onComplete(@NonNull Task<String> task) {
+
                                     awita.setText(task.getResult());
                                 }
                             });
@@ -129,8 +118,7 @@ public class MainActivity extends AppCompatActivity {
                                         translatedImage(task.getResult()).addOnCompleteListener(new OnCompleteListener<String>() {
                                             @Override
                                             public void onComplete(@NonNull Task<String> task2) {
-                                                String textToSpeech = task2.getResult();
-                                                awita.setContentDescription(textToSpeech);
+                                                textToSpeech = task2.getResult();
                                                 awita.setText(task2.getResult());
                                             }
                                         });
@@ -167,6 +155,14 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
                 builder.show();
+            }
+        });
+        //TODO: Sincronizarlo bien para que haya respuesta o hacer que diga que aun no hay respuesta
+        //algo de esso (añadirlo al onComplete alomejor)
+        decirDescripcion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                decirDescripcion.setContentDescription(textToSpeech);
             }
         });
     }
@@ -266,9 +262,5 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private String getFileextension(Uri muri) {
-        ContentResolver cr = getContentResolver();
-        MimeTypeMap mime = MimeTypeMap.getSingleton();
-        return mime.getExtensionFromMimeType(cr.getType(muri));
-    }
+
 }
