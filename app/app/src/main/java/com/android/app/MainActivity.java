@@ -40,6 +40,9 @@ import com.google.firebase.storage.UploadTask;
 import com.google.firebase.database.DatabaseReference;
 
 import org.checkerframework.checker.units.qual.C;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -118,11 +121,12 @@ public class MainActivity extends AppCompatActivity {
                             callImagen(texto).addOnCompleteListener(new OnCompleteListener<String>() {
                                 @Override
                                 public void onComplete(@NonNull Task<String> task) {
+
+                                    awita.setText(task.getResult());
                                     try {
-                                        translatedImagen(task.getResult()).addOnCompleteListener(new OnCompleteListener<String>() {
+                                        translatedImage(task.getResult()).addOnCompleteListener(new OnCompleteListener<String>(){
                                             @Override
                                             public void onComplete(@NonNull Task<String> task2) {
-                                                String texto = task2.getResult();
                                                 awita.setText(task2.getResult());
                                             }
                                         });
@@ -224,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
-    private Task<String> translatedImagen(String name) throws IOException {
+    private Task<String> translatedImage(String name) throws IOException {
 
         Map<String,Object> data = new HashMap<>();
         data.put("texto",name);
