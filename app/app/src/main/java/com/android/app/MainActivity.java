@@ -37,6 +37,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.database.DatabaseReference;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -113,15 +116,30 @@ public class MainActivity extends AppCompatActivity {
                             callImagen(texto).addOnCompleteListener(new OnCompleteListener<String>() {
                                 @Override
                                 public void onComplete(@NonNull Task<String> task) {
-                                    String salida;
-                                    salida=convertirString(task.getResult());
+                                    JSONObject hola;
+                                    String jsonString = addBackslash(task.getResult());//Pa que se puea hacer un JSON
+                                    String salida = null;
+                                    try {
+                                        hola = new JSONObject(jsonString);
+                                        salida = hola.getString("generated_text");
+                                    } catch (JSONException e) {
+                                        throw new RuntimeException(e);
+                                    }
+
                                     awita.setText(salida);
                                     try {
                                         translatedImage(salida).addOnCompleteListener(new OnCompleteListener<String>() {
                                             @Override
                                             public void onComplete(@NonNull Task<String> task2) {
-                                                String salida2;
-                                                salida2 = convertirString(task2.getResult());
+                                                JSONObject hola1;
+                                                String jsonString1 = addBackslash(task2.getResult());//Pa que se puea hacer un JSON
+                                                String salida2 = null;
+                                                try {
+                                                    hola1 = new JSONObject(jsonString1);
+                                                    salida2 = hola1.getString("translation_text");
+                                                } catch (JSONException e) {
+                                                    throw new RuntimeException(e);
+                                                }
                                                 textToSpeech = salida2;
                                                 awita.setText(salida2);
                                             }
@@ -171,10 +189,23 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private String convertirString(String result) {
+    private String convertirAJSON(String result) throws JSONException {
+
         String[] parts = result.split(":");
         return parts[1].replace("]"," ");
     }
+    private  String addBackslash(String input) {//Pal JSON
+        String result = "";
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+
+            result+=c;
+        }
+        String ret = result;
+        ret = ret.substring(1,result.length()-1);
+        return ret;
+    }
+
 
     private void rotarImagen(Intent data) throws IOException {
         sacarRelacion(data);
@@ -189,14 +220,15 @@ public class MainActivity extends AppCompatActivity {
         Bitmap bitmap = ImageDecoder.decodeBitmap(source);
         int imageHeight = bitmap.getHeight();
         int imageWidth = bitmap.getWidth();
-        //Con esto se puede recortar la imagen.
-        //ivPicture.setImageBitmap(Bitmap.createBitmap(bitmap,0,0,imageWidth/2,imageHeight/2));
         int ratio = imageHeight / imageWidth;
         if (ratio >= 1) {
             return false;
         } else {
             return true;
         }
+    }
+    public void cortarImagen(Bitmap b, int[] coordenadas){ // Recortar el objeto deseado
+        ivPicture.setImageBitmap(Bitmap.createBitmap(b,coordenadas[0],coordenadas[1],coordenadas[2],coordenadas[3]));
     }
 
     private String codificar(Uri uri) throws IOException {
