@@ -40,6 +40,7 @@ import com.google.firebase.database.DatabaseReference;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
     ActivityResultLauncher<Intent> cameraLauncher;
     ActivityResultLauncher<Intent> galleryLauncher;
-     String textToSpeech;
+    String textToSpeech;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,14 +113,17 @@ public class MainActivity extends AppCompatActivity {
                             callImagen(texto).addOnCompleteListener(new OnCompleteListener<String>() {
                                 @Override
                                 public void onComplete(@NonNull Task<String> task) {
-
-                                    awita.setText(task.getResult());
+                                    String salida;
+                                    salida=convertirString(task.getResult());
+                                    awita.setText(salida);
                                     try {
-                                        translatedImage(task.getResult()).addOnCompleteListener(new OnCompleteListener<String>() {
+                                        translatedImage(salida).addOnCompleteListener(new OnCompleteListener<String>() {
                                             @Override
                                             public void onComplete(@NonNull Task<String> task2) {
-                                                textToSpeech = task2.getResult();
-                                                awita.setText(task2.getResult());
+                                                String salida2;
+                                                salida2 = convertirString(task2.getResult());
+                                                textToSpeech = salida2;
+                                                awita.setText(salida2);
                                             }
                                         });
                                     } catch (IOException e) {
@@ -167,10 +171,15 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private String convertirString(String result) {
+        String[] parts = result.split(":");
+        return parts[1].replace("]"," ");
+    }
 
     private void rotarImagen(Intent data) throws IOException {
-        if (sacarRelacion(data))
-            Glide.with(getApplicationContext()).load(data.getData()).apply(new RequestOptions().transform(new Rotate(90))) // Rotación de 90 grados
+        sacarRelacion(data);
+       if (sacarRelacion(data))
+           Glide.with(getApplicationContext()).load(data.getData()).apply(new RequestOptions().transform(new Rotate(90))) // Rotación de 90 grados
                     .into(ivPicture);
         else ivPicture.setImageURI(data.getData());
     }
@@ -180,6 +189,8 @@ public class MainActivity extends AppCompatActivity {
         Bitmap bitmap = ImageDecoder.decodeBitmap(source);
         int imageHeight = bitmap.getHeight();
         int imageWidth = bitmap.getWidth();
+        //Con esto se puede recortar la imagen.
+        //ivPicture.setImageBitmap(Bitmap.createBitmap(bitmap,0,0,imageWidth/2,imageHeight/2));
         int ratio = imageHeight / imageWidth;
         if (ratio >= 1) {
             return false;
