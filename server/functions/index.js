@@ -17,6 +17,19 @@ async function descriptor(data) {
 	return result;
 }
 
+async function tagging(data) {
+	const response = await fetch(
+		"https://api-inference.huggingface.co/models/facebook/detr-resnet-50",
+		{
+			headers: { Authorization: "Bearer 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" },
+			method: "POST",
+			body: data,
+		}
+	);
+	const result = await response.json();
+	return result;
+}
+
 async function query(data) {
 	const response = await fetch(
 		"https://api-inference.huggingface.co/models/Helsinki-NLP/opus-mt-en-es",
@@ -36,6 +49,15 @@ exports.descripImagen = onCall((data, response) => {
 	const buffer  = Buffer.from(base64,'base64');
 
 	return descriptor(buffer).then((response) => {
+		return JSON.stringify(response);
+	});
+ });
+
+ exports.tagsImagen = onCall((data, response) => {
+	console.log("Función de tags conectada");
+	const base64 = data.url;
+	const buffer  = Buffer.from(base64,'base64');
+	return tagging(buffer).then((response) => {
 		return JSON.stringify(response);
 	});
  });
