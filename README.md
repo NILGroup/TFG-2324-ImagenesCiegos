@@ -7,6 +7,15 @@ Aplicación móvil para facilitar la interpretación de imágenes a personas con
 ## Documentación
 
 [Memoria](https://es.overleaf.com/read/phcbvtdyskyn#6152ba): desarollo completo donde se incluye la investigación y el desarrollo técnico del proyecto.
+1. Introducción
+ * Motivación
+ * Objetivos
+ * Plan de trabajo 
+2. Estado del arte
+ * Tecnologías de descripción de imágenes
+ * Trabajo de fin de grado anterior
+3. Descripción del trabajo
+4. Conclusiones y trabajo futuro
 
 
 ## Instalación
