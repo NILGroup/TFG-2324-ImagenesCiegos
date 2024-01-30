@@ -43,7 +43,6 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,18 +56,20 @@ public class MainActivity extends AppCompatActivity {
     private Uri imageUri;
     ImageView ivPicture;
     TextView tvResult;
-    TextView awita;
     Button btnChoosePicture;
     Button decirDescripcion;
 
     private static final int CAMERA_PERMISSION_CODE = 223;
-    private static final int READ_STORAGE_PERMISSION_CODE = 144;
-    private static final int WRITE_STORAGE_PERMISSION_CODE = 144;
     private static final String TAG = "Numero Objetos detectados";
 
     ActivityResultLauncher<Intent> cameraLauncher;
     ActivityResultLauncher<Intent> galleryLauncher;
     String textToSpeech;
+
+    //TODO Apartir de aqui las variables estan colocadas
+    private Descripcion descripcion;
+    private Traduccion traduccion;
+    private Identificador identificador;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,8 +79,6 @@ public class MainActivity extends AppCompatActivity {
         ivPicture = findViewById(R.id.ivPicture);
         tvResult = findViewById(R.id.tvResult);
         decirDescripcion = findViewById(R.id.decirDescripcion);
-        awita = findViewById(R.id.awita);
-
         btnChoosePicture = findViewById(R.id.btnChoosePicture);
         cameraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
                     @Override
@@ -89,11 +88,11 @@ public class MainActivity extends AppCompatActivity {
                             Bitmap photo = (Bitmap) data.getExtras().get("data");
                             ivPicture.setImageBitmap(photo);
                             imageUri = data.getData();
-                            callImagen(imageUri.toString()).addOnCompleteListener(new OnCompleteListener<String>() {
+                            callImagen(imageUri.toString()).addOnCompleteListener(new OnCompleteListener<Descripcion>() {
                                 @Override
-                                public void onComplete(@NonNull Task<String> task) {
+                                public void onComplete(@NonNull Task<Descripcion> task) {
 
-                                    awita.setText(task.getResult());
+                                    tvResult.setText(task.getResult().getTexto());
                                 }
                             });
                         } catch (Exception e) {
@@ -113,35 +112,15 @@ public class MainActivity extends AppCompatActivity {
                             imageUri = data.getData();
 
                             String texto = codificar(imageUri);
-                            callImagen(texto).addOnCompleteListener(new OnCompleteListener<String>() {
+                            callImagen(texto).addOnCompleteListener(new OnCompleteListener<Descripcion>() {
                                 @Override
-                                public void onComplete(@NonNull Task<String> task) {
-                                    JSONObject hola;
-                                    String jsonString = addBackslash(task.getResult());//Pa que se puea hacer un JSON
-                                    String salida = null;
+                                public void onComplete(@NonNull Task<Descripcion> task) {
                                     try {
-                                        hola = new JSONObject(jsonString);
-                                        salida = hola.getString("generated_text");
-                                    } catch (JSONException e) {
-                                        throw new RuntimeException(e);
-                                    }
-
-                                    awita.setText(salida);
-                                    try {
-                                        translatedImage(salida).addOnCompleteListener(new OnCompleteListener<String>() {
+                                        translatedImage(task.getResult().getTexto()).addOnCompleteListener(new OnCompleteListener<Traduccion>() {
                                             @Override
-                                            public void onComplete(@NonNull Task<String> task2) {
-                                                JSONObject hola1;
-                                                String jsonString1 = addBackslash(task2.getResult());//Pa que se puea hacer un JSON
-                                                String salida2 = null;
-                                                try {
-                                                    hola1 = new JSONObject(jsonString1);
-                                                    salida2 = hola1.getString("translation_text");
-                                                } catch (JSONException e) {
-                                                    throw new RuntimeException(e);
-                                                }
-                                                textToSpeech = salida2;
-                                                awita.setText(salida2);
+                                            public void onComplete(@NonNull Task<Traduccion> task2) {
+                                                textToSpeech = task2.getResult().getTexto();
+                                                tvResult.setText(task2.getResult().getTexto());
                                             }
                                         });
                                     } catch (IOException e) {
@@ -188,18 +167,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    private  String addBackslash(String input) {//Pal JSON
-        String result = "";
-        for (int i = 0; i < input.length(); i++) {
-            char c = input.charAt(i);
-
-            result+=c;
-        }
-        String ret = result;
-        ret = ret.substring(1,result.length()-1);
-        return ret;
-    }
-
 
     private void rotarImagen(Intent data) throws IOException {
         sacarRelacion(data);
@@ -251,50 +218,32 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, requestCode);
         }
     }
-    /*public void onRequestPermissionsResult(int requestCode,@NonNull String[] permissions,@NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == CAMERA_PERMISSION_CODE) {
-            if (!(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                Toast.makeText(MainActivity.this, "Permiso de cámara denegado1", Toast.LENGTH_SHORT).show();
-            } else {
-                CheckPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE, READ_STORAGE_PERMISSION_CODE);
-            }
-        } else if (requestCode == READ_STORAGE_PERMISSION_CODE) {
-            if (!(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                Toast.makeText(MainActivity.this, "Permiso de cámara denegado2", Toast.LENGTH_SHORT).show();
-            } else {
-                CheckPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, WRITE_STORAGE_PERMISSION_CODE);
-            }
-        } else if (requestCode == WRITE_STORAGE_PERMISSION_CODE) {
-            if (!(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                Toast.makeText(MainActivity.this, "Permiso de cámara denegado3", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }*/
 
     //funcion que llama a la cloud function
-    private Task<String> callImagen(String name) throws IOException {
+    private Task<Descripcion> callImagen(String name) throws IOException {
 
         Map<String, Object> data = new HashMap<>();
         data.put("url", name);
 
-        return fFunc.getHttpsCallable("descripImagen").call(data).continueWith(new Continuation<HttpsCallableResult, String>() {
+        return fFunc.getHttpsCallable("descripImagen").call(data).continueWith(new Continuation<HttpsCallableResult, Descripcion>() {
             @Override
-            public String then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                return (String) task.getResult().getData();
+            public Descripcion then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                descripcion = new Descripcion((String) task.getResult().getData());
+                return descripcion;
             }
         });
     }
 
-    private Task<String> translatedImage(String name) throws IOException {
+    private Task<Traduccion> translatedImage(String name) throws IOException {
 
         Map<String, Object> data = new HashMap<>();
         data.put("texto", name);
 
-        return fFunc.getHttpsCallable("traducDescrip").call(data).continueWith(new Continuation<HttpsCallableResult, String>() {
+        return fFunc.getHttpsCallable("traducDescrip").call(data).continueWith(new Continuation<HttpsCallableResult, Traduccion>() {
             @Override
-            public String then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                return (String) task.getResult().getData();
+            public Traduccion then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                traduccion = new Traduccion((String) task.getResult().getData());
+                return traduccion;
             }
         });
     }

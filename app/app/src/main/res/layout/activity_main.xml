@@ -9,64 +9,49 @@
 
     <ImageView
         android:id="@+id/ivPicture"
-        android:layout_width="656dp"
-        android:layout_height="848dp"
+        android:layout_width="391dp"
+        android:layout_height="640dp"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_launcher_background"
         app:layout_constraintBottom_toTopOf="@+id/tvResult"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
 
     <TextView
         android:id="@+id/tvResult"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="354dp"
+        android:layout_height="30dp"
         android:layout_margin="10dp"
         android:text="Result"
         android:textColor="@color/black"
         android:textSize="25dp"
-
-        app:layout_constraintBottom_toTopOf="@+id/btnChoosePicture"
+        app:layout_constraintBottom_toTopOf="@+id/decirDescripcion"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <TextView
-        android:id="@+id/awita"
-        android:layout_width="384dp"
-        android:layout_height="107dp"
-        android:text="La imagen esta arriba"
-        android:textColor="@color/black"
-        android:textSize="25dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.817"
-        android:contentDescription="@string/app_name" />
-
     <Button
         android:id="@+id/decirDescripcion"
-        android:layout_width="71dp"
-        android:layout_height="35dp"
+        android:layout_width="172dp"
+        android:layout_height="91dp"
         android:layout_margin="10dp"
-        android:text="Descripción"
+        android:layout_marginBottom="8dp"
+        android:contentDescription="Obtener Descripción"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintHorizontal_bias="0.481"
+        app:layout_constraintStart_toEndOf="@+id/btnChoosePicture" />
 
     <Button
         android:id="@+id/btnChoosePicture"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Choose Picture"
+        android:layout_width="178dp"
+        android:layout_height="92dp"
         android:layout_margin="10dp"
+        android:contentDescription="Seleccionar Foto"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0" />
