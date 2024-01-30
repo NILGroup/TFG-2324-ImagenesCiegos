@@ -21,14 +21,15 @@ Aplicación móvil para facilitar la interpretación de imágenes a personas con
 ## Instalación
 
 ```bash
-  npm install my-project
-  cd my-project
+  installar app-debug.apk
 ```
     
 ## Demo
 
 Insert gif or link to demo
 
+##Diagrama UML
+![Diagrama](https://raw.githubusercontent.com/NILGroup/TFG-2324-ImagenesCiegos/main/app/app/src/main/java/diagrama.png?token=GHSAT0AAAAAACNPQMA5UVBJQOFLXUVFFU2QZNZNGHQ)
 
 ## Autores
 
