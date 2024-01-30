@@ -188,12 +188,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-    private String convertirAJSON(String result) throws JSONException {
-
-        String[] parts = result.split(":");
-        return parts[1].replace("]"," ");
-    }
     private  String addBackslash(String input) {//Pal JSON
         String result = "";
         for (int i = 0; i < input.length(); i++) {
