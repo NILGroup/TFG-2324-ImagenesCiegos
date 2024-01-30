@@ -14,8 +14,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.ImageDecoder;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -24,18 +22,12 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.Rotate;
-import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import android.speech.tts.TextToSpeech;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Base64;
 
 public class MainActivity extends AppCompatActivity {
     private static final int CAMERA_PERMISSION_CODE = 223;
@@ -94,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
                             firebase.callImagen(imagen.getImageUri()).addOnCompleteListener(new OnCompleteListener<Descripcion>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Descripcion> task) {
-
                                     tvResult.setText(task.getResult().getTexto());
                                 }
                             });
@@ -110,9 +101,9 @@ public class MainActivity extends AppCompatActivity {
                     public void onActivityResult(ActivityResult result) {
                         Intent data = result.getData();
                         try {
-                            rotarImagen(data);//Rota si es necesario y muestra la imagen
-                            //ivPicture.setImageURI(data.getData());
                             imagen = new Imagen(MainActivity.this,data.getData());
+                            imagen.rotarImagen(data,ivPicture);//Rota si es necesario y muestra la imagen
+                            //ivPicture.setImageURI(data.getData());
                             firebase.callImagen(imagen.getBase64()).addOnCompleteListener(new OnCompleteListener<Descripcion>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Descripcion> task) {
@@ -120,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
                                         firebase.translatedImage(task.getResult().getTexto()).addOnCompleteListener(new OnCompleteListener<Traduccion>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Traduccion> task2) {
+                                                firebase.callTags(imagen.getBase64()).getResult();
                                                 textTo = task2.getResult().getTexto();
                                                 tvResult.setText(task2.getResult().getTexto());
                                             }
@@ -168,28 +160,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-    private void rotarImagen(Intent data) throws IOException {
-        sacarRelacion(data);
-        if (sacarRelacion(data))
-            Glide.with(getApplicationContext()).load(data.getData()).apply(new RequestOptions().transform(new Rotate(90))) // Rotación de 90 grados
-                    .into(ivPicture);
-        else ivPicture.setImageURI(data.getData());
-    }
-
-    private boolean sacarRelacion(Intent data) throws IOException { //Ve si una imagen tiene que ir en vertical o en horizontal
-        ImageDecoder.Source source = ImageDecoder.createSource(this.getContentResolver(), data.getData());
-        Bitmap bitmap = ImageDecoder.decodeBitmap(source);
-        int imageHeight = bitmap.getHeight();
-        int imageWidth = bitmap.getWidth();
-        int ratio = imageHeight / imageWidth;
-        return ratio<1;
-    }
-
-    public void cortarImagen(Bitmap b, int[] coordenadas) { // Recortar el objeto deseado
-        ivPicture.setImageBitmap(Bitmap.createBitmap(b, coordenadas[0], coordenadas[1], coordenadas[2], coordenadas[3]));
-    }
-
     @Override
     protected void onResume() {
         super.onResume();

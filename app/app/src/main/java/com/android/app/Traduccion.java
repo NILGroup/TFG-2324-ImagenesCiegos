@@ -4,7 +4,7 @@ import org.json.JSONException;
 
 public class Traduccion extends Query{
 
-    private String texto;
+    protected String texto;
 
     public Traduccion(String input) throws JSONException {
         super(input);

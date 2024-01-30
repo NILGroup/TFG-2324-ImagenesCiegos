@@ -3,7 +3,7 @@ package com.android.app;
 import org.json.JSONException;
 
 public class Descripcion extends Query{
-    private String texto;
+    protected String texto;
 
     public Descripcion(String input) throws JSONException {
         super(input);
