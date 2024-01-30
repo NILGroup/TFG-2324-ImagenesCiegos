@@ -21,6 +21,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -58,8 +59,8 @@ public class MainActivity extends AppCompatActivity {
     private Uri imageUri;
     ImageView ivPicture;
     TextView tvResult;
-    Button btnChoosePicture;
-    Button decirDescripcion;
+    ImageButton btnChoosePicture;
+    ImageButton decirDescripcion;
 
     private static final int CAMERA_PERMISSION_CODE = 223;
     private static final String TAG = "Numero Objetos detectados";
