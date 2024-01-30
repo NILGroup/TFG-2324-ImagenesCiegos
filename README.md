@@ -30,8 +30,8 @@ Aplicación móvil para facilitar la interpretación de imágenes a personas con
 
 ## Diagrama UML
 
-<img src="https://raw.githubusercontent.com/NILGroup/TFG-2324-ImagenesCiegos/main/app/app/src/main/java/diagrama.png?token=GHSAT0AAAAAACNPQMA5UVBJQOFLXUVFFU2QZNZNGHQ"
-     alt="Diagrma" width=50% height=50%>
+<img src="https://raw.githubusercontent.com/NILGroup/TFG-2324-ImagenesCiegos/main/app/app/src/main/java/diagrama.png?token=GHSAT0AAAAAACNPQMA4GZIB5J53DF3E7UP4ZNZNUTQ"
+     alt="Diagrama" width=50% height=50%>
 
 ## Autores
 
