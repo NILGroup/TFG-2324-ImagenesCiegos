@@ -20,7 +20,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -28,18 +27,8 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.Rotate;
 import com.bumptech.glide.request.RequestOptions;
-import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.functions.FirebaseFunctions;
-import com.google.firebase.functions.HttpsCallableResult;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.database.DatabaseReference;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.speech.tts.TextToSpeech;
 
@@ -47,21 +36,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-
-    private FirebaseFunctions fFunc = FirebaseFunctions.getInstance();
-    private FirebaseStorage storage = FirebaseStorage.getInstance();
-    private StorageReference storageReference = storage.getReference();
-    private DatabaseReference root = FirebaseDatabase.getInstance().getReference().child("imagenes");
-    private Uri imageUri;
-    ImageView ivPicture;
-    TextView tvResult;
-    ImageButton btnChoosePicture;
-    ImageButton decirDescripcion;
-
     private static final int CAMERA_PERMISSION_CODE = 223;
     private static final String TAG = "Numero Objetos detectados";
 
@@ -71,7 +47,16 @@ public class MainActivity extends AppCompatActivity {
 
     private TextToSpeech textToSpeech;
 
-    //TODO Apartir de aqui las variables estan colocadas
+    //TODO Apartir de aquí las variables estan colocadas
+    private FireFunctions firebase;
+    //Variables xml
+    private ImageView ivPicture;
+    private TextView tvResult;
+    private ImageButton btnChoosePicture;
+    private ImageButton decirDescripcion;
+
+    //Objetos necesarios
+    private Imagen imagen;
     private Descripcion descripcion;
     private Traduccion traduccion;
     private Identificador identificador;
@@ -80,12 +65,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         ivPicture = findViewById(R.id.ivPicture);
         tvResult = findViewById(R.id.tvResult);
         decirDescripcion = findViewById(R.id.decirDescripcion);
         btnChoosePicture = findViewById(R.id.btnChoosePicture);
-
+        firebase = new FireFunctions();
         //Inicializar el text To speech
         textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
@@ -106,8 +90,8 @@ public class MainActivity extends AppCompatActivity {
                         try {
                             Bitmap photo = (Bitmap) data.getExtras().get("data");
                             ivPicture.setImageBitmap(photo);
-                            imageUri = data.getData();
-                            callImagen(imageUri.toString()).addOnCompleteListener(new OnCompleteListener<Descripcion>() {
+                            imagen = new Imagen(MainActivity.this, data.getData());
+                            firebase.callImagen(imagen.getImageUri()).addOnCompleteListener(new OnCompleteListener<Descripcion>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Descripcion> task) {
 
@@ -128,14 +112,12 @@ public class MainActivity extends AppCompatActivity {
                         try {
                             rotarImagen(data);//Rota si es necesario y muestra la imagen
                             //ivPicture.setImageURI(data.getData());
-                            imageUri = data.getData();
-
-                            String texto = codificar(imageUri);
-                            callImagen(texto).addOnCompleteListener(new OnCompleteListener<Descripcion>() {
+                            imagen = new Imagen(MainActivity.this,data.getData());
+                            firebase.callImagen(imagen.getBase64()).addOnCompleteListener(new OnCompleteListener<Descripcion>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Descripcion> task) {
                                     try {
-                                        translatedImage(task.getResult().getTexto()).addOnCompleteListener(new OnCompleteListener<Traduccion>() {
+                                        firebase.translatedImage(task.getResult().getTexto()).addOnCompleteListener(new OnCompleteListener<Traduccion>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Traduccion> task2) {
                                                 textTo = task2.getResult().getTexto();
@@ -157,9 +139,9 @@ public class MainActivity extends AppCompatActivity {
         btnChoosePicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String[] options = {"camera", "gallery"};
+                String[] options = {"camara", "galeria"};
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("Elige una Opcion");
+                builder.setTitle("Elige una Opción");
                 builder.setItems(options, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -201,30 +183,11 @@ public class MainActivity extends AppCompatActivity {
         int imageHeight = bitmap.getHeight();
         int imageWidth = bitmap.getWidth();
         int ratio = imageHeight / imageWidth;
-        if (ratio >= 1) {
-            return false;
-        } else {
-            return true;
-        }
+        return ratio<1;
     }
 
     public void cortarImagen(Bitmap b, int[] coordenadas) { // Recortar el objeto deseado
         ivPicture.setImageBitmap(Bitmap.createBitmap(b, coordenadas[0], coordenadas[1], coordenadas[2], coordenadas[3]));
-    }
-
-    private String codificar(Uri uri) throws IOException {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        InputStream inputStream = getContentResolver().openInputStream(uri);
-        byte[] buffer = new byte[1024];
-        int bytesRead;
-        while ((bytesRead = inputStream.read(buffer)) != -1) {
-            byteArrayOutputStream.write(buffer, 0, bytesRead);
-        }
-        byte[] byteArray = byteArrayOutputStream.toByteArray();
-
-        // Convertir el array de bytes a base64
-        String base64Image = Base64.getEncoder().encodeToString(byteArray);
-        return base64Image;
     }
 
     @Override
@@ -238,35 +201,4 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, requestCode);
         }
     }
-
-    //funcion que llama a la cloud function
-    private Task<Descripcion> callImagen(String name) throws IOException {
-
-        Map<String, Object> data = new HashMap<>();
-        data.put("url", name);
-
-        return fFunc.getHttpsCallable("descripImagen").call(data).continueWith(new Continuation<HttpsCallableResult, Descripcion>() {
-            @Override
-            public Descripcion then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                descripcion = new Descripcion((String) task.getResult().getData());
-                return descripcion;
-            }
-        });
-    }
-
-    private Task<Traduccion> translatedImage(String name) throws IOException {
-
-        Map<String, Object> data = new HashMap<>();
-        data.put("texto", name);
-
-        return fFunc.getHttpsCallable("traducDescrip").call(data).continueWith(new Continuation<HttpsCallableResult, Traduccion>() {
-            @Override
-            public Traduccion then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                traduccion = new Traduccion((String) task.getResult().getData());
-                return traduccion;
-            }
-        });
-    }
-
-
 }

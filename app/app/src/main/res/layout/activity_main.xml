@@ -17,13 +17,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/tvResult"
-        android:layout_width="354dp"
-        android:layout_height="30dp"
+        android:layout_width="365dp"
+        android:layout_height="35dp"
         android:layout_margin="10dp"
+        android:layout_marginBottom="8dp"
         android:text="Result"
         android:textColor="@color/black"
         android:textSize="25dp"
@@ -33,21 +34,24 @@
 
     <ImageButton
         android:id="@+id/btnChoosePicture"
-        android:layout_width="158dp"
-        android:layout_height="119dp"
+        android:layout_width="195dp"
+        android:layout_height="118dp"
         android:layout_marginTop="8dp"
+        android:contentDescription="Seleccionar imagen"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/decirDescripcion"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvResult"
+        app:layout_constraintVertical_bias="1.0"
         app:srcCompat="@android:drawable/ic_menu_gallery"
         tools:ignore="MissingConstraints" />
 
     <ImageButton
         android:id="@+id/decirDescripcion"
-        android:layout_width="155dp"
-        android:layout_height="117dp"
+        android:layout_width="196dp"
+        android:layout_height="119dp"
+        android:contentDescription="Obtener descripción"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@android:drawable/ic_lock_silent_mode_off" />

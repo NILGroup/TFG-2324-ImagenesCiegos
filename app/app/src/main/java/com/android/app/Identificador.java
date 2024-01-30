@@ -5,15 +5,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Identificador {
-    private JSONArray json;
+    protected JSONArray json;
     public Identificador(String input) throws JSONException {
         input = input.substring(1,input.length()-1);
         json = new JSONArray(input);
     }
 
     public String getObject(int x, int y) throws JSONException {
-
-        String ret = "";
 
         for(int i = 0; i<json.length(); i++){
             if(estaContenido(json.getJSONObject(i).getJSONObject("box"),x,y)){
