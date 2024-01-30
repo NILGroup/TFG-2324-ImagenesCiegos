@@ -26,7 +26,7 @@ Aplicación móvil para facilitar la interpretación de imágenes a personas con
     
 ## Demo
 <img src="https://drive.google.com/uc?export=view&id=1JqDVLDFsc4Zgtz9tkpUhtgsxI7Yld-HY"
-     alt="Demo" width="360" height="640">
+     alt="Demo" width=25% height=25%>
 
 ## Diagrama UML
 ![Diagrama](https://raw.githubusercontent.com/NILGroup/TFG-2324-ImagenesCiegos/main/app/app/src/main/java/diagrama.png?token=GHSAT0AAAAAACNPQMA5UVBJQOFLXUVFFU2QZNZNGHQ)
