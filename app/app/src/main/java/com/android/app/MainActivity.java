@@ -9,6 +9,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import android.speech.tts.TextToSpeech;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -68,7 +69,8 @@ public class MainActivity extends AppCompatActivity {
 
     ActivityResultLauncher<Intent> cameraLauncher;
     ActivityResultLauncher<Intent> galleryLauncher;
-    String textToSpeech;
+    String textTo;
+     private TextToSpeech textToSpeech;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +83,20 @@ public class MainActivity extends AppCompatActivity {
         awita = findViewById(R.id.awita);
 
         btnChoosePicture = findViewById(R.id.btnChoosePicture);
+
+        //Inicializar el text To speech
+        textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    // Text-to-Speech está listo para su uso
+                } else {
+                    // Algo salió mal, Text-to-Speech no está disponible
+                    Log.e("TextToSpeech", "Initialization failed");
+                }
+            }
+        });
+
         cameraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
                     @Override
                     public void onActivityResult(ActivityResult result) {
@@ -140,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
                                                 } catch (JSONException e) {
                                                     throw new RuntimeException(e);
                                                 }
-                                                textToSpeech = salida2;
+                                                textTo = salida2;
                                                 awita.setText(salida2);
                                             }
                                         });
@@ -181,10 +197,11 @@ public class MainActivity extends AppCompatActivity {
         });
         //TODO: Sincronizarlo bien para que haya respuesta o hacer que diga que aun no hay respuesta
         //algo de esso (añadirlo al onComplete alomejor)
+        //Para que se diga la descripcion con el talkBack
         decirDescripcion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                decirDescripcion.setContentDescription(textToSpeech);
+                textToSpeech.speak(textTo,TextToSpeech.QUEUE_FLUSH,null,null);
             }
         });
     }
