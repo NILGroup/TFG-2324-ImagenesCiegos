@@ -2,6 +2,7 @@ package com.android.app;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -13,11 +14,18 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import android.speech.tts.TextToSpeech;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+
+import org.json.JSONException;
 
 import java.io.IOException;
 
@@ -41,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
 
     //Objetos necesarios
     private Imagen imagen;
+
+    private Identificador identificador;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,9 +92,14 @@ public class MainActivity extends AppCompatActivity {
                 //ivPicture.setImageURI(data.getData());
                 firebase.callImagen(imagen.getBase64()).addOnCompleteListener(task -> {
                     try {
+                        firebase.callTags(imagen.getBase64()).addOnCompleteListener(new OnCompleteListener<Identificador>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Identificador> task) {
+                                identificador = task.getResult();
+                            }
+                        });
                         firebase.translatedImage(task.getResult().getTexto()).addOnCompleteListener(task2 -> {
                             //TODO llamar identificador
-                            //firebase.callTags(imagen.getBase64()).getResult();
                             textTo = task2.getResult().getTexto();
                             tvResult.setText(task2.getResult().getTexto());
                         });
@@ -119,6 +134,34 @@ public class MainActivity extends AppCompatActivity {
         //algo de esso (añadirlo al onComplete alomejor)
         decirDescripcion.setOnClickListener(v -> textToSpeech.speak(textTo, TextToSpeech.QUEUE_FLUSH, null, null));
     }
+
+    public boolean onTouchEvent(MotionEvent event) {
+        int x = (int) event.getX();
+        int y = (int) event.getY();
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN :
+                // Acción cuando se presiona la pantalla
+                try {
+                    int width = ivPicture.getWidth();
+                    int height = ivPicture.getHeight();
+                    textToSpeech.speak(identificador.getObject(x,y), TextToSpeech.QUEUE_FLUSH, null, null);
+
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                };
+                break;
+            case MotionEvent.ACTION_MOVE:
+                // Acción cuando se mueve el dedo sobre la pantalla
+
+                break;
+            case MotionEvent.ACTION_UP:
+                // Acción cuando se levanta el dedo de la pantalla
+                break;
+        }
+
+        return true;
+    }
+
     @Override
     protected void onResume() {
         super.onResume();

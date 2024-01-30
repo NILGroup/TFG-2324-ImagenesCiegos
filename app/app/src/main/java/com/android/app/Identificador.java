@@ -7,7 +7,6 @@ import org.json.JSONObject;
 public class Identificador {
     protected JSONArray json;
     public Identificador(String input) throws JSONException {
-        input = input.substring(1,input.length()-1);
         json = new JSONArray(input);
     }
 
