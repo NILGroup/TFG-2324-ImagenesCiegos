@@ -9,7 +9,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import android.speech.tts.TextToSpeech;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -65,8 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
     ActivityResultLauncher<Intent> cameraLauncher;
     ActivityResultLauncher<Intent> galleryLauncher;
-    String textTo;
-     private TextToSpeech textToSpeech;
+    String textToSpeech;
 
     //TODO Apartir de aqui las variables estan colocadas
     private Descripcion descripcion;
@@ -82,20 +80,6 @@ public class MainActivity extends AppCompatActivity {
         tvResult = findViewById(R.id.tvResult);
         decirDescripcion = findViewById(R.id.decirDescripcion);
         btnChoosePicture = findViewById(R.id.btnChoosePicture);
-
-        //Inicializar el text To speech
-        textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if (status == TextToSpeech.SUCCESS) {
-                    // Text-to-Speech está listo para su uso
-                } else {
-                    // Algo salió mal, Text-to-Speech no está disponible
-                    Log.e("TextToSpeech", "Initialization failed");
-                }
-            }
-        });
-
         cameraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
                     @Override
                     public void onActivityResult(ActivityResult result) {
@@ -137,19 +121,6 @@ public class MainActivity extends AppCompatActivity {
                                             public void onComplete(@NonNull Task<Traduccion> task2) {
                                                 textToSpeech = task2.getResult().getTexto();
                                                 tvResult.setText(task2.getResult().getTexto());
-
-                                            public void onComplete(@NonNull Task<String> task2) {
-                                                JSONObject hola1;
-                                                String jsonString1 = addBackslash(task2.getResult());//Pa que se puea hacer un JSON
-                                                String salida2 = null;
-                                                try {
-                                                    hola1 = new JSONObject(jsonString1);
-                                                    salida2 = hola1.getString("translation_text");
-                                                } catch (JSONException e) {
-                                                    throw new RuntimeException(e);
-                                                }
-                                                textTo = salida2;
-                                                awita.setText(salida2);
                                             }
                                         });
                                     } catch (IOException e) {
@@ -189,11 +160,10 @@ public class MainActivity extends AppCompatActivity {
         });
         //TODO: Sincronizarlo bien para que haya respuesta o hacer que diga que aun no hay respuesta
         //algo de esso (añadirlo al onComplete alomejor)
-        //Para que se diga la descripcion con el talkBack
         decirDescripcion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                textToSpeech.speak(textTo,TextToSpeech.QUEUE_FLUSH,null,null);
+                decirDescripcion.setContentDescription(textToSpeech);
             }
         });
     }
