@@ -40,6 +40,8 @@ import com.google.firebase.database.DatabaseReference;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.speech.tts.TextToSpeech;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,7 +66,9 @@ public class MainActivity extends AppCompatActivity {
 
     ActivityResultLauncher<Intent> cameraLauncher;
     ActivityResultLauncher<Intent> galleryLauncher;
-    String textToSpeech;
+    String textTo;
+
+    private TextToSpeech textToSpeech;
 
     //TODO Apartir de aqui las variables estan colocadas
     private Descripcion descripcion;
@@ -80,6 +84,20 @@ public class MainActivity extends AppCompatActivity {
         tvResult = findViewById(R.id.tvResult);
         decirDescripcion = findViewById(R.id.decirDescripcion);
         btnChoosePicture = findViewById(R.id.btnChoosePicture);
+
+        //Inicializar el text To speech
+        textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    // Text-to-Speech está listo para su uso
+                } else {
+                    // Algo salió mal, Text-to-Speech no está disponible
+                    Log.e("TextToSpeech", "Initialization failed");
+                }
+            }
+        });
+
         cameraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
                     @Override
                     public void onActivityResult(ActivityResult result) {
@@ -119,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
                                         translatedImage(task.getResult().getTexto()).addOnCompleteListener(new OnCompleteListener<Traduccion>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Traduccion> task2) {
-                                                textToSpeech = task2.getResult().getTexto();
+                                                textTo = task2.getResult().getTexto();
                                                 tvResult.setText(task2.getResult().getTexto());
                                             }
                                         });
@@ -163,15 +181,15 @@ public class MainActivity extends AppCompatActivity {
         decirDescripcion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                decirDescripcion.setContentDescription(textToSpeech);
+                textToSpeech.speak(textTo, TextToSpeech.QUEUE_FLUSH, null, null);
             }
         });
     }
 
     private void rotarImagen(Intent data) throws IOException {
         sacarRelacion(data);
-       if (sacarRelacion(data))
-           Glide.with(getApplicationContext()).load(data.getData()).apply(new RequestOptions().transform(new Rotate(90))) // Rotación de 90 grados
+        if (sacarRelacion(data))
+            Glide.with(getApplicationContext()).load(data.getData()).apply(new RequestOptions().transform(new Rotate(90))) // Rotación de 90 grados
                     .into(ivPicture);
         else ivPicture.setImageURI(data.getData());
     }
@@ -188,8 +206,9 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
     }
-    public void cortarImagen(Bitmap b, int[] coordenadas){ // Recortar el objeto deseado
-        ivPicture.setImageBitmap(Bitmap.createBitmap(b,coordenadas[0],coordenadas[1],coordenadas[2],coordenadas[3]));
+
+    public void cortarImagen(Bitmap b, int[] coordenadas) { // Recortar el objeto deseado
+        ivPicture.setImageBitmap(Bitmap.createBitmap(b, coordenadas[0], coordenadas[1], coordenadas[2], coordenadas[3]));
     }
 
     private String codificar(Uri uri) throws IOException {
