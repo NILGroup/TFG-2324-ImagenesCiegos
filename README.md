@@ -30,7 +30,7 @@ Aplicación móvil para facilitar la interpretación de imágenes a personas con
 
 ## Diagrama UML
 
-<img src="https://drive.google.com/uc?export=view&id=1rlINeDgfJ9Pl8pXZC1PZO8VaQQMKNlRb"
+<img src="https://drive.google.com/uc?export=view&id=1Nj8sIcWrKyFu4c253rE7EhJu-YLlkVB2"
      alt="Diagrama" width=50% height=50%>
 
 ## Autores
