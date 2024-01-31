@@ -49,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
 
     //Objetos necesarios
     private Imagen imagen;
-
     private Identificador identificador;
 
     @Override
