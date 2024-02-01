@@ -2,7 +2,6 @@ package com.android.app;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -17,15 +16,12 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import android.speech.tts.TextToSpeech;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.android.app.Hilo.HiloTag;
 
 import org.json.JSONException;
 
@@ -75,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
             Intent data = result.getData();
             try {
                 Bitmap photo = (Bitmap) data.getExtras().get("data");
+                ivPicture.setImageBitmap(photo);
                 tratamientoImagen(data);
             } catch (Exception e) {
                 Log.d(TAG, "onActivityResult:" + e.getMessage());
@@ -121,9 +118,7 @@ public class MainActivity extends AppCompatActivity {
                 // Acción cuando se presiona la pantalla
                 try {
                     tags.join();
-                    //Rarete llamar a esto aqui no?
                     identificador = tags.getIdentificador();
-
 
                     int width = ivPicture.getWidth();
                     int height = ivPicture.getHeight();
@@ -176,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
         imagen.rotarImagen(data,ivPicture);//Rota si es necesario y muestra la imagen
         firebase.callImagen(imagen.getBase64()).addOnCompleteListener(task -> {
             try {
-                tags = new HiloTag(firebase, imagen);
+                tags = new HiloTag(imagen);
                 tags.start();
                 firebase.translatedImage(task.getResult().getTexto()).addOnCompleteListener(task2 -> {
                     textTo = task2.getResult().getTexto();
