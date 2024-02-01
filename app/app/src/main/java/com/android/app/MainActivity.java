@@ -120,13 +120,10 @@ public class MainActivity extends AppCompatActivity {
                     identificador = tags.getIdentificador();
                     textToSpeech.speak(identificador.getObject(x,y), TextToSpeech.QUEUE_FLUSH, null, null);
 
-
                     int width = ivPicture.getWidth();
                     int height = ivPicture.getHeight();
                     Rect rect = new Rect();
                     ivPicture.getHitRect(rect);
-                    ivPicture.setDrawingCacheEnabled(true);
-                    ivPicture.buildDrawingCache();
                     Bitmap bitmap = ivPicture.getDrawingCache();
 
                     if(y>= bitmap.getHeight()){
@@ -139,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
                             return true;
                         }
                         if (rect.contains(x, y)) { //del imagavew general
+
                         }
                         else {
 
