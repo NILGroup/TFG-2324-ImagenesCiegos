@@ -21,6 +21,7 @@ import android.widget.ImageView;
 
 import android.speech.tts.TextToSpeech;
 
+import com.android.app.Hilo.HiloDescrip;
 import com.android.app.Hilo.HiloTag;
 
 import org.json.JSONException;
@@ -166,13 +167,13 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private void tratamientoImagen(Intent data) throws IOException {
+    private void tratamientoImagen(Intent data) throws IOException, InterruptedException {
         imagen = new Imagen(MainActivity.this,data.getData());
         imagen.rotarImagen(data,ivPicture);//Rota si es necesario y muestra la imagen
+        tags = new HiloTag(imagen);
+        tags.start();
         firebase.callImagen(imagen.getBase64()).addOnCompleteListener(task -> {
             try {
-                tags = new HiloTag(imagen);
-                tags.start();
                 firebase.translatedImage(task.getResult().getTexto()).addOnCompleteListener(task2 -> {
                     textTo = task2.getResult().getTexto();
                     textToSpeech.speak(textTo, TextToSpeech.QUEUE_FLUSH, null, null);
@@ -197,7 +198,6 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         CheckPermission(android.Manifest.permission.CAMERA, CAMERA_PERMISSION_CODE);
     }
-
     public void CheckPermission(String permission, int requestCode) {
         if (ContextCompat.checkSelfPermission(MainActivity.this, permission) == PackageManager.PERMISSION_DENIED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, requestCode);
