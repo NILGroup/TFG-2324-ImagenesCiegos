@@ -10,8 +10,13 @@
     <ImageView
         android:id="@+id/ivPicture"
 <<<<<<< HEAD
+<<<<<<< HEAD
         android:layout_width="match_parent"
         android:layout_height="614dp"
+=======
+        android:layout_width="391dp"
+        android:layout_height="640dp"
+>>>>>>> parent of 3b86046 (Hilo Tagging)
 =======
         android:layout_width="391dp"
         android:layout_height="640dp"
@@ -46,6 +51,9 @@
         android:layout_width="195dp"
         android:layout_height="118dp"
         android:layout_marginTop="8dp"
+<<<<<<< HEAD
+>>>>>>> parent of 3b86046 (Hilo Tagging)
+=======
 >>>>>>> parent of 3b86046 (Hilo Tagging)
         android:contentDescription="Seleccionar imagen"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -53,7 +61,11 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
 <<<<<<< HEAD
+<<<<<<< HEAD
         app:layout_constraintTop_toBottomOf="@+id/ivPicture"
+=======
+        app:layout_constraintTop_toBottomOf="@+id/tvResult"
+>>>>>>> parent of 3b86046 (Hilo Tagging)
 =======
         app:layout_constraintTop_toBottomOf="@+id/tvResult"
 >>>>>>> parent of 3b86046 (Hilo Tagging)
@@ -65,7 +77,11 @@
         android:id="@+id/decirDescripcion"
         android:layout_width="196dp"
 <<<<<<< HEAD
+<<<<<<< HEAD
         android:layout_height="115dp"
+=======
+        android:layout_height="119dp"
+>>>>>>> parent of 3b86046 (Hilo Tagging)
 =======
         android:layout_height="119dp"
 >>>>>>> parent of 3b86046 (Hilo Tagging)
