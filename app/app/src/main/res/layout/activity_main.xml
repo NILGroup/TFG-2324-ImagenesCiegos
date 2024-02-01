@@ -9,24 +9,54 @@
 
     <ImageView
         android:id="@+id/ivPicture"
+<<<<<<< HEAD
         android:layout_width="match_parent"
         android:layout_height="614dp"
+=======
+        android:layout_width="391dp"
+        android:layout_height="640dp"
+>>>>>>> parent of 3b86046 (Hilo Tagging)
         android:scaleType="fitCenter"
         android:src="@drawable/ic_launcher_background"
+        app:layout_constraintBottom_toTopOf="@+id/tvResult"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/tvResult"
+        android:layout_width="365dp"
+        android:layout_height="35dp"
+        android:layout_margin="10dp"
+        android:layout_marginBottom="8dp"
+        android:text="Result"
+        android:textColor="@color/black"
+        android:textSize="25dp"
+        app:layout_constraintBottom_toTopOf="@+id/decirDescripcion"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageButton
         android:id="@+id/btnChoosePicture"
+<<<<<<< HEAD
         android:layout_width="197dp"
         android:layout_height="115dp"
+=======
+        android:layout_width="195dp"
+        android:layout_height="118dp"
+        android:layout_marginTop="8dp"
+>>>>>>> parent of 3b86046 (Hilo Tagging)
         android:contentDescription="Seleccionar imagen"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/decirDescripcion"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
+<<<<<<< HEAD
         app:layout_constraintTop_toBottomOf="@+id/ivPicture"
+=======
+        app:layout_constraintTop_toBottomOf="@+id/tvResult"
+>>>>>>> parent of 3b86046 (Hilo Tagging)
         app:layout_constraintVertical_bias="1.0"
         app:srcCompat="@android:drawable/ic_menu_gallery"
         tools:ignore="MissingConstraints" />
@@ -34,11 +64,14 @@
     <ImageButton
         android:id="@+id/decirDescripcion"
         android:layout_width="196dp"
+<<<<<<< HEAD
         android:layout_height="115dp"
+=======
+        android:layout_height="119dp"
+>>>>>>> parent of 3b86046 (Hilo Tagging)
         android:contentDescription="Obtener descripción"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivPicture"
         app:srcCompat="@android:drawable/ic_lock_silent_mode_off" />
 
 

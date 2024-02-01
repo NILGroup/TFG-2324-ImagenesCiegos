@@ -10,8 +10,6 @@ import androidx.core.content.ContextCompat;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -37,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     //TODO Apartir de aquí las variables estan colocadas
     //Variables xml
     private ImageView ivPicture;
+    private TextView tvResult;
     private ImageButton btnChoosePicture;
     private ImageButton decirDescripcion;
 
@@ -45,14 +44,18 @@ public class MainActivity extends AppCompatActivity {
     private FireFunctions firebase;
     private Imagen imagen;
     private Identificador identificador;
+<<<<<<< HEAD
     private Traduccion descripTraducida;
     private HiloTag tags;
+=======
+>>>>>>> parent of 3b86046 (Hilo Tagging)
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ivPicture = findViewById(R.id.ivPicture);
+        tvResult = findViewById(R.id.tvResult);
         decirDescripcion = findViewById(R.id.decirDescripcion);
         btnChoosePicture = findViewById(R.id.btnChoosePicture);
         firebase = new FireFunctions();
@@ -71,7 +74,12 @@ public class MainActivity extends AppCompatActivity {
             try {
                 Bitmap photo = (Bitmap) data.getExtras().get("data");
                 ivPicture.setImageBitmap(photo);
+<<<<<<< HEAD
                 tratamientoImagen(data);
+=======
+                imagen = new Imagen(MainActivity.this, data.getData());
+                firebase.callImagen(imagen.getImageUri()).addOnCompleteListener(task -> tvResult.setText(task.getResult().getTexto()));
+>>>>>>> parent of 3b86046 (Hilo Tagging)
             } catch (Exception e) {
                 Log.d("TAG", "onActivityResult:" + e.getMessage());
             }
@@ -81,11 +89,31 @@ public class MainActivity extends AppCompatActivity {
         galleryLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             Intent data = result.getData();
             try {
-                tratamientoImagen(data);
+                imagen = new Imagen(MainActivity.this,data.getData());
+                imagen.rotarImagen(data,ivPicture);//Rota si es necesario y muestra la imagen
+                //ivPicture.setImageURI(data.getData());
+                firebase.callImagen(imagen.getBase64()).addOnCompleteListener(task -> {
+                    try {
+                        firebase.callTags(imagen.getBase64()).addOnCompleteListener(new OnCompleteListener<Identificador>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Identificador> task) {
+                                identificador = task.getResult();
+                            }
+                        });
+                        firebase.translatedImage(task.getResult().getTexto()).addOnCompleteListener(task2 -> {
+                            //TODO llamar identificador
+                            textTo = task2.getResult().getTexto();
+                            tvResult.setText(task2.getResult().getTexto());
+                        });
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
             } catch (Exception e) {
                 Log.d("TAG", "onActivityResult:" + e.getMessage());
             }
         }
+
         );
         btnChoosePicture.setOnClickListener(view -> {
             String[] options = {"camara", "galeria"};
@@ -116,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
             case MotionEvent.ACTION_DOWN :
                 // Acción cuando se presiona la pantalla
                 try {
+<<<<<<< HEAD
                     tags.join();
                     identificador = tags.getIdentificador();
                     textToSpeech.speak(identificador.getObject(x,y), TextToSpeech.QUEUE_FLUSH, null, null);
@@ -136,6 +165,11 @@ public class MainActivity extends AppCompatActivity {
                             return true;
                         }
                         if (rect.contains(x, y)) { //del imagavew general
+=======
+                    int width = ivPicture.getWidth();
+                    int height = ivPicture.getHeight();
+                    textToSpeech.speak(identificador.getObject(x,y), TextToSpeech.QUEUE_FLUSH, null, null);
+>>>>>>> parent of 3b86046 (Hilo Tagging)
 
                         }
                         else {
@@ -144,10 +178,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                ;
+                };
                 break;
             case MotionEvent.ACTION_MOVE:
                 // Acción cuando se mueve el dedo sobre la pantalla
@@ -161,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+<<<<<<< HEAD
     private void tratamientoImagen(Intent data) throws IOException {
         imagen = new Imagen(MainActivity.this,data.getData());
         imagen.rotarImagen(data,ivPicture);//Rota si es necesario y muestra la imagen
@@ -178,6 +210,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+=======
+>>>>>>> parent of 3b86046 (Hilo Tagging)
     @Override
     protected void onResume() {
         super.onResume();
