@@ -74,12 +74,9 @@ public class MainActivity extends AppCompatActivity {
             try {
                 Bitmap photo = (Bitmap) data.getExtras().get("data");
                 ivPicture.setImageBitmap(photo);
-<<<<<<< HEAD
                 tratamientoImagen(data);
-=======
                 imagen = new Imagen(MainActivity.this, data.getData());
                 firebase.callImagen(imagen.getImageUri()).addOnCompleteListener(task -> tvResult.setText(task.getResult().getTexto()));
->>>>>>> parent of 3b86046 (Hilo Tagging)
             } catch (Exception e) {
                 Log.d("TAG", "onActivityResult:" + e.getMessage());
             }
@@ -144,7 +141,6 @@ public class MainActivity extends AppCompatActivity {
             case MotionEvent.ACTION_DOWN :
                 // Acción cuando se presiona la pantalla
                 try {
-<<<<<<< HEAD
                     tags.join();
                     identificador = tags.getIdentificador();
                     textToSpeech.speak(identificador.getObject(x,y), TextToSpeech.QUEUE_FLUSH, null, null);
@@ -165,11 +161,9 @@ public class MainActivity extends AppCompatActivity {
                             return true;
                         }
                         if (rect.contains(x, y)) { //del imagavew general
-=======
                     int width = ivPicture.getWidth();
                     int height = ivPicture.getHeight();
                     textToSpeech.speak(identificador.getObject(x,y), TextToSpeech.QUEUE_FLUSH, null, null);
->>>>>>> parent of 3b86046 (Hilo Tagging)
 
                         }
                         else {
