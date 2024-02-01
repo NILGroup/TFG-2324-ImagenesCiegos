@@ -7,10 +7,9 @@ import org.json.JSONObject;
 import java.util.Arrays;
 import java.util.List;
 
-public class Identificador {
-    protected JSONArray json;
+public class Identificador extends Query{
     public Identificador(String input) throws JSONException {
-        json = new JSONArray(input);
+        super(input);
     }
 
     public String getObject(int x, int y) throws JSONException {

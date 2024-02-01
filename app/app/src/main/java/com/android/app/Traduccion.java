@@ -8,7 +8,7 @@ public class Traduccion extends Query{
 
     public Traduccion(String input) throws JSONException {
         super(input);
-        texto = json.getString("translation_text");
+        texto = json.getJSONObject(0).getString("translation_text");
     }
 
     public String getTexto() {

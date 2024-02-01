@@ -2,7 +2,6 @@ package com.android.app;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -17,40 +16,36 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import android.speech.tts.TextToSpeech;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.android.app.hilos.HiloTag;
 
 import org.json.JSONException;
 
 import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
-    private static final int CAMERA_PERMISSION_CODE = 223;
-    private static final String TAG = "Numero Objetos detectados";
 
+    //Variables de seleccion de imagen
+    private static final int CAMERA_PERMISSION_CODE = 223;
     ActivityResultLauncher<Intent> cameraLauncher;
     ActivityResultLauncher<Intent> galleryLauncher;
-    String textTo;
-
-    private TextToSpeech textToSpeech;
 
     //TODO Apartir de aquí las variables estan colocadas
-    private FireFunctions firebase;
     //Variables xml
     private ImageView ivPicture;
     private ImageButton btnChoosePicture;
     private ImageButton decirDescripcion;
 
     //Objetos necesarios
+    private TextToSpeech textToSpeech;
+    private FireFunctions firebase;
     private Imagen imagen;
     private Identificador identificador;
+    private Traduccion descripTraducida;
     private HiloTag tags;
 
     @Override
@@ -75,9 +70,10 @@ public class MainActivity extends AppCompatActivity {
             Intent data = result.getData();
             try {
                 Bitmap photo = (Bitmap) data.getExtras().get("data");
+                ivPicture.setImageBitmap(photo);
                 tratamientoImagen(data);
             } catch (Exception e) {
-                Log.d(TAG, "onActivityResult:" + e.getMessage());
+                Log.d("TAG", "onActivityResult:" + e.getMessage());
             }
         }
 
@@ -87,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 tratamientoImagen(data);
             } catch (Exception e) {
-                Log.d(TAG, "onActivityResult:" + e.getMessage());
+                Log.d("TAG", "onActivityResult:" + e.getMessage());
             }
         }
         );
@@ -110,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         });
         //TODO: Sincronizarlo bien para que haya respuesta o hacer que diga que aun no hay respuesta
         //algo de esso (añadirlo al onComplete alomejor)
-        decirDescripcion.setOnClickListener(v -> textToSpeech.speak(textTo, TextToSpeech.QUEUE_FLUSH, null, null));
+        decirDescripcion.setOnClickListener(v -> textToSpeech.speak(descripTraducida.getTexto(), TextToSpeech.QUEUE_FLUSH, null, null));
     }
 
     public boolean onTouchEvent(MotionEvent event) {
@@ -124,7 +120,8 @@ public class MainActivity extends AppCompatActivity {
                     identificador = tags.getIdentificador();
                     textToSpeech.speak(identificador.getObject(x,y), TextToSpeech.QUEUE_FLUSH, null, null);
 
-                    /*int width = ivPicture.getWidth();
+
+                    int width = ivPicture.getWidth();
                     int height = ivPicture.getHeight();
                     Rect rect = new Rect();
                     ivPicture.getHitRect(rect);
@@ -132,15 +129,21 @@ public class MainActivity extends AppCompatActivity {
                     ivPicture.buildDrawingCache();
                     Bitmap bitmap = ivPicture.getDrawingCache();
 
-                    int pixel = bitmap.getPixel(x, y);
-                    if (Color.alpha(pixel) == 0) {
+                    if(y>= bitmap.getHeight()){
                         textToSpeech.speak("Estás fuera de la imagen", TextToSpeech.QUEUE_FLUSH, null, null);
                         return true;
-                    }
-                    if (rect.contains(x, y)) { //del imagavew general
-                    } else {
-                    }*/
+                    }else{
+                        int pixel = bitmap.getPixel(x, y);
+                        if (Color.alpha(pixel) == 0) {
+                            textToSpeech.speak("Estás fuera de la imagen", TextToSpeech.QUEUE_FLUSH, null, null);
+                            return true;
+                        }
+                        if (rect.contains(x, y)) { //del imagavew general
+                        }
+                        else {
 
+                        }
+                    }
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 } catch (InterruptedException e) {
@@ -163,13 +166,13 @@ public class MainActivity extends AppCompatActivity {
     private void tratamientoImagen(Intent data) throws IOException {
         imagen = new Imagen(MainActivity.this,data.getData());
         imagen.rotarImagen(data,ivPicture);//Rota si es necesario y muestra la imagen
+        tags = new HiloTag(imagen);
+        tags.start();
         firebase.callImagen(imagen.getBase64()).addOnCompleteListener(task -> {
             try {
-                tags = new HiloTag(firebase, imagen);
-                tags.start();
                 firebase.translatedImage(task.getResult().getTexto()).addOnCompleteListener(task2 -> {
-                    textTo = task2.getResult().getTexto();
-                    textToSpeech.speak(textTo, TextToSpeech.QUEUE_FLUSH, null, null);
+                    descripTraducida = task2.getResult();
+                    textToSpeech.speak(descripTraducida.getTexto(), TextToSpeech.QUEUE_FLUSH, null, null);
                 });
             } catch (IOException e) {
                 throw new RuntimeException(e);

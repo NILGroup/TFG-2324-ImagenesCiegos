@@ -28,8 +28,6 @@ public class Imagen {
         this.contexto=contexto;
         codBase64(imageUri);
     }
-
-    public String getImageUri() {return imageUri.toString();}
     public String getBase64() {return base64;}
 
     private void codBase64(Uri uri) throws IOException {
