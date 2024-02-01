@@ -11,6 +11,8 @@ import androidx.core.content.ContextCompat;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -43,20 +45,19 @@ public class MainActivity extends AppCompatActivity {
     private FireFunctions firebase;
     //Variables xml
     private ImageView ivPicture;
-    private TextView tvResult;
     private ImageButton btnChoosePicture;
     private ImageButton decirDescripcion;
 
     //Objetos necesarios
     private Imagen imagen;
     private Identificador identificador;
+    private HiloTag tags;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ivPicture = findViewById(R.id.ivPicture);
-        tvResult = findViewById(R.id.tvResult);
         decirDescripcion = findViewById(R.id.decirDescripcion);
         btnChoosePicture = findViewById(R.id.btnChoosePicture);
         firebase = new FireFunctions();
@@ -74,9 +75,7 @@ public class MainActivity extends AppCompatActivity {
             Intent data = result.getData();
             try {
                 Bitmap photo = (Bitmap) data.getExtras().get("data");
-                ivPicture.setImageBitmap(photo);
-                imagen = new Imagen(MainActivity.this, data.getData());
-                firebase.callImagen(imagen.getImageUri()).addOnCompleteListener(task -> tvResult.setText(task.getResult().getTexto()));
+                tratamientoImagen(data);
             } catch (Exception e) {
                 Log.d(TAG, "onActivityResult:" + e.getMessage());
             }
@@ -86,31 +85,11 @@ public class MainActivity extends AppCompatActivity {
         galleryLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             Intent data = result.getData();
             try {
-                imagen = new Imagen(MainActivity.this,data.getData());
-                imagen.rotarImagen(data,ivPicture);//Rota si es necesario y muestra la imagen
-                //ivPicture.setImageURI(data.getData());
-                firebase.callImagen(imagen.getBase64()).addOnCompleteListener(task -> {
-                    try {
-                        firebase.callTags(imagen.getBase64()).addOnCompleteListener(new OnCompleteListener<Identificador>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Identificador> task) {
-                                identificador = task.getResult();
-                            }
-                        });
-                        firebase.translatedImage(task.getResult().getTexto()).addOnCompleteListener(task2 -> {
-                            //TODO llamar identificador
-                            textTo = task2.getResult().getTexto();
-                            tvResult.setText(task2.getResult().getTexto());
-                        });
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+                tratamientoImagen(data);
             } catch (Exception e) {
                 Log.d(TAG, "onActivityResult:" + e.getMessage());
             }
         }
-
         );
         btnChoosePicture.setOnClickListener(view -> {
             String[] options = {"camara", "galeria"};
@@ -141,13 +120,33 @@ public class MainActivity extends AppCompatActivity {
             case MotionEvent.ACTION_DOWN :
                 // Acción cuando se presiona la pantalla
                 try {
-                    int width = ivPicture.getWidth();
-                    int height = ivPicture.getHeight();
+                    tags.join();
+                    identificador = tags.getIdentificador();
                     textToSpeech.speak(identificador.getObject(x,y), TextToSpeech.QUEUE_FLUSH, null, null);
+
+                    /*int width = ivPicture.getWidth();
+                    int height = ivPicture.getHeight();
+                    Rect rect = new Rect();
+                    ivPicture.getHitRect(rect);
+                    ivPicture.setDrawingCacheEnabled(true);
+                    ivPicture.buildDrawingCache();
+                    Bitmap bitmap = ivPicture.getDrawingCache();
+
+                    int pixel = bitmap.getPixel(x, y);
+                    if (Color.alpha(pixel) == 0) {
+                        textToSpeech.speak("Estás fuera de la imagen", TextToSpeech.QUEUE_FLUSH, null, null);
+                        return true;
+                    }
+                    if (rect.contains(x, y)) { //del imagavew general
+                    } else {
+                    }*/
 
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
-                };
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                ;
                 break;
             case MotionEvent.ACTION_MOVE:
                 // Acción cuando se mueve el dedo sobre la pantalla
@@ -159,6 +158,23 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return true;
+    }
+
+    private void tratamientoImagen(Intent data) throws IOException {
+        imagen = new Imagen(MainActivity.this,data.getData());
+        imagen.rotarImagen(data,ivPicture);//Rota si es necesario y muestra la imagen
+        firebase.callImagen(imagen.getBase64()).addOnCompleteListener(task -> {
+            try {
+                tags = new HiloTag(firebase, imagen);
+                tags.start();
+                firebase.translatedImage(task.getResult().getTexto()).addOnCompleteListener(task2 -> {
+                    textTo = task2.getResult().getTexto();
+                    textToSpeech.speak(textTo, TextToSpeech.QUEUE_FLUSH, null, null);
+                });
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     @Override

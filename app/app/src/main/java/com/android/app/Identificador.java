@@ -4,6 +4,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class Identificador {
     protected JSONArray json;
     public Identificador(String input) throws JSONException {
@@ -20,6 +23,25 @@ public class Identificador {
             }
         }
         return "No hay ningún objeto";
+    }
+
+    public String getLabels() throws JSONException {
+        String ret = "";
+        for(int i = 0; i<json.length(); i++){
+            ret += '"' + json.getJSONObject(i).getString("label") + '"' + ',';
+        }
+        ret = ret.substring(0,ret.length()-1);
+        return ret;
+    }
+
+    public void changeLabels(String input) throws JSONException {
+
+        String[] lista = input.replaceAll("\"","").split(",");
+        List<String> newLabels = Arrays.asList(lista);
+
+        for(int i = 0; i<json.length(); i++){
+            json.getJSONObject(i).put("label", newLabels.get(i));
+        }
     }
 
     private boolean estaContenido(JSONObject box, int x, int y) throws JSONException {
