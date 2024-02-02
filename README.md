@@ -35,12 +35,12 @@ Aplicación móvil para facilitar la interpretación de imágenes a personas con
 - [Helsinki Translation Model](https://huggingface.co/Helsinki-NLP/opus-mt-en-es)
 
 <img src="https://drive.google.com/uc?export=view&id=1Kkh_AbUtj3N8yPZTo3FoBWMthZAKAfE0"
-     alt="Demo" width=50% height=50%>
+     alt="Demo" width=65% height=65%>
 
 ## Diagrama UML
 
 <img src="https://drive.google.com/uc?export=view&id=1Nj8sIcWrKyFu4c253rE7EhJu-YLlkVB2"
-     alt="Diagrama" width=50% height=50%>
+     alt="Diagrama" width=35% height=35%>
 
 ## Autores
 
