@@ -28,6 +28,15 @@ Aplicación móvil para facilitar la interpretación de imágenes a personas con
 <img src="https://drive.google.com/uc?export=view&id=1JqDVLDFsc4Zgtz9tkpUhtgsxI7Yld-HY"
      alt="Demo" width=25% height=25%>
 
+## Api Refences
+
+- [SalesForce Captioning Model](https://huggingface.co/Salesforce/blip-image-captioning-large)
+- [Facebook Object Detection Model](https://huggingface.co/facebook/detr-resnet-50)
+- [Helsinki Translation Model]([https://www.github.com/eskei-ucm](https://huggingface.co/Helsinki-NLP/opus-mt-en-es)
+- 
+- <img src="https://drive.google.com/uc?export=view&id=1Kkh_AbUtj3N8yPZTo3FoBWMthZAKAfE0"
+     alt="Demo" width=25% height=25%>
+
 ## Diagrama UML
 
 <img src="https://drive.google.com/uc?export=view&id=1Nj8sIcWrKyFu4c253rE7EhJu-YLlkVB2"
