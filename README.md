@@ -52,6 +52,7 @@ Aplicación móvil para facilitar la interpretación de imágenes a personas con
 ## Proyectos relacionados
 
 [TFG-2223-DescripcionImagenesCiegos](https://github.com/NILGroup/TFG-2223-DescripcionImagenesCiegos)
+![Imagen](https://opengraph.githubassets.com/2a79fb4a7f49ddda9164f08148c20c7f21dcd5bd3ff4459cb869772a3f2e0f39/NILGroup/TFG-2223-DescripcionImagenesCiegos)
 
 ## Licencia
 
