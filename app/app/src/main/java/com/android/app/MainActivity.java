@@ -112,58 +112,59 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean onTouchEvent(MotionEvent event) {
-        int x = (int) event.getX();
-        int y = (int) event.getY();
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN :
-                // Acción cuando se presiona la pantalla
-                try {
-                    tags.join();
-                    identificador = tags.getIdentificador();
+        if(imagen!=null) {
+            int x = (int) event.getX();
+            int y = (int) event.getY();
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    // Acción cuando se presiona la pantalla
+                    try {
+                        tags.join();
+                        identificador = tags.getIdentificador();
 
-                    int width = ivPicture.getWidth();
-                    int height = ivPicture.getHeight();
+                        int width = ivPicture.getWidth();
+                        int height = ivPicture.getHeight();
 
-                    ivPicture.setEnabled(false);
+                        ivPicture.setEnabled(false);
 
-                    Rect rect = new Rect();
-                    ivPicture.getHitRect(rect);
-                    ivPicture.setDrawingCacheEnabled(true);
-                    ivPicture.buildDrawingCache();
-                    Bitmap bitmap = ivPicture.getDrawingCache();
-                    if(y>= height){
-                        textToSpeech.speak("Estás fuera de la imagen", TextToSpeech.QUEUE_FLUSH, null, null);
-                        return true;
-                    }else{
-                        int pixel = bitmap.getPixel(x, y);
-                        if (Color.alpha(pixel) == 0) {
+                        Rect rect = new Rect();
+                        ivPicture.getHitRect(rect);
+                        ivPicture.setDrawingCacheEnabled(true);
+                        ivPicture.buildDrawingCache();
+                        Bitmap bitmap = ivPicture.getDrawingCache();
+                        if (y >= height) {
                             textToSpeech.speak("Estás fuera de la imagen", TextToSpeech.QUEUE_FLUSH, null, null);
                             return true;
-                        }else{
-                            textToSpeech.speak(identificador.getObject(x,y), TextToSpeech.QUEUE_FLUSH, null, null);
-                        }
-                        if (rect.contains(x, y)) { //del imagavew general
                         } else {
+                            int pixel = bitmap.getPixel(x, y);
+                            if (Color.alpha(pixel) == 0) {
+                                textToSpeech.speak("Estás fuera de la imagen", TextToSpeech.QUEUE_FLUSH, null, null);
+                                return true;
+                            } else {
+                                textToSpeech.speak(identificador.getObject(x, y), TextToSpeech.QUEUE_FLUSH, null, null);
+                            }
+                            if (rect.contains(x, y)) { //del imagavew general
+                            } else {
+                            }
                         }
+
+
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
                     }
+                    ;
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    // Acción cuando se mueve el dedo sobre la pantalla
 
-
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                ;
-                break;
-            case MotionEvent.ACTION_MOVE:
-                // Acción cuando se mueve el dedo sobre la pantalla
-
-                break;
-            case MotionEvent.ACTION_UP:
-                // Acción cuando se levanta el dedo de la pantalla
-                break;
+                    break;
+                case MotionEvent.ACTION_UP:
+                    // Acción cuando se levanta el dedo de la pantalla
+                    break;
+            }
         }
-
         return true;
     }
 
