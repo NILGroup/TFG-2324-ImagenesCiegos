@@ -53,8 +53,6 @@ Aplicación móvil para facilitar la interpretación de imágenes a personas con
 
 [TFG-2223-DescripcionImagenesCiegos](https://github.com/NILGroup/TFG-2223-DescripcionImagenesCiegos)
 
-[Vue](https://github.com/WalidBousnitra/MAR/blob/main/README.md)
-
 ## Licencia
 
 TFG-2324-ImagenesCiegos © 2024 is licensed under [Attribution-NonCommercial-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1).
