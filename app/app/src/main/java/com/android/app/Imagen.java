@@ -28,8 +28,6 @@ public class Imagen {
         this.contexto=contexto;
         codBase64(imageUri);
     }
-
-    public String getImageUri() {return imageUri.toString();}
     public String getBase64() {return base64;}
 
     private void codBase64(Uri uri) throws IOException {
@@ -47,12 +45,13 @@ public class Imagen {
         inputStream.close();
     }
 
-    public void rotarImagen(Intent data, ImageView ivPicture) throws IOException {
-        sacarRelacion(data);
-        if (sacarRelacion(data))
+    public boolean rotarImagen(Intent data, ImageView ivPicture) throws IOException {
+        boolean giro = sacarRelacion(data);
+        if (giro)
             Glide.with(contexto.getApplicationContext()).load(data.getData()).apply(new RequestOptions().transform(new Rotate(90))) // Rotación de 90 grados
                     .into(ivPicture);
         else ivPicture.setImageURI(data.getData());
+        return giro;
     }
     private boolean sacarRelacion(Intent data) throws IOException { //Ve si una imagen tiene que ir en vertical o en horizontal
         ImageDecoder.Source source = ImageDecoder.createSource(contexto.getContentResolver(), Objects.requireNonNull(data.getData()));
@@ -63,7 +62,24 @@ public class Imagen {
         return ratio<1;
     }
 
-    public void cortarImagen(Bitmap b, int[] coordenadas, ImageView ivPicture) { // Recortar el objeto deseado
-        ivPicture.setImageBitmap(Bitmap.createBitmap(b, coordenadas[0], coordenadas[1], coordenadas[2], coordenadas[3]));
+    public Imagen cortarImagen(int[] coordenadas) throws IOException {
+        // Obtener la imagen original como un bitmap
+        ImageDecoder.Source source = ImageDecoder.createSource(contexto.getContentResolver(), imageUri);
+        Bitmap originalBitmap = ImageDecoder.decodeBitmap(source);
+
+        // Crear un nuevo bitmap que sea el recorte
+        Bitmap croppedBitmap = Bitmap.createBitmap(originalBitmap, coordenadas[0], coordenadas[1], coordenadas[2], coordenadas[3]);
+
+        // Convertir el nuevo bitmap a base64
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        croppedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+        byte[] croppedByteArray = byteArrayOutputStream.toByteArray();
+        String croppedBase64 = Base64.getEncoder().encodeToString(croppedByteArray);
+
+        // Crear y devolver un nuevo objeto Imagen con la imagen recortada
+        Imagen imagenRecortada = new Imagen(contexto, imageUri);
+        imagenRecortada.base64 = croppedBase64;  // Actualizar el base64 con el recorte
+
+        return imagenRecortada;
     }
 }
