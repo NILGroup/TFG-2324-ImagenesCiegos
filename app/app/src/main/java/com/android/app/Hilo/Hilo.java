@@ -7,6 +7,8 @@ public class Hilo extends Thread{
     FireFunctions firebase;
     Imagen imagen;
 
+    public Hilo(){}
+
     public Hilo(Imagen imagen){
         firebase = new FireFunctions();
         this.imagen = imagen;

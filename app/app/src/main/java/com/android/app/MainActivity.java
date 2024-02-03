@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -21,6 +20,8 @@ import android.widget.ImageView;
 
 import android.speech.tts.TextToSpeech;
 
+import com.android.app.Hilo.Hilo;
+import com.android.app.Hilo.HiloDescrip;
 import com.android.app.Hilo.HiloTag;
 
 import org.json.JSONException;
@@ -29,16 +30,17 @@ import java.io.IOException;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
+
+    //Seleccion de imagen
     private static final int CAMERA_PERMISSION_CODE = 223;
     private static final String TAG = "Numero Objetos detectados";
-
     ActivityResultLauncher<Intent> cameraLauncher;
     ActivityResultLauncher<Intent> galleryLauncher;
-    String textTo;
 
+    //TextToSpeech
+    private String textTo;
     private TextToSpeech textToSpeech;
-
-    //TODO Apartir de aquí las variables estan colocadas
+    //Firebase
     private FireFunctions firebase;
     //Variables xml
     private ImageView ivPicture;
@@ -55,7 +57,6 @@ public class MainActivity extends AppCompatActivity {
         ImageButton decirDescripcion = findViewById(R.id.decirDescripcion);
         ImageButton btnChoosePicture = findViewById(R.id.btnChoosePicture);
         firebase = new FireFunctions();
-        //Inicializar el text To speech
         textToSpeech = new TextToSpeech(this, status -> {});
 
         cameraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -96,46 +97,38 @@ public class MainActivity extends AppCompatActivity {
             });
             builder.show();
         });
-        //TODO: Sincronizarlo bien para que haya respuesta o hacer que diga que aun no hay respuesta
-        //algo de esso (añadirlo al onComplete alomejor)
         decirDescripcion.setOnClickListener(v -> textToSpeech.speak(textTo, TextToSpeech.QUEUE_FLUSH, null, null));
     }
 
     public boolean onTouchEvent(MotionEvent event) {
+        String msg;
         if (imagen!=null && event.getAction() == MotionEvent.ACTION_DOWN) {
             int x = (int) event.getX();
             int y = (int) event.getY();
             try {
                 tags.join();
                 Identificador identificador = tags.getIdentificador();
-
-                int width = ivPicture.getWidth();
-                int height = ivPicture.getHeight();
-
-                ivPicture.setEnabled(false);
-
-                Rect rect = new Rect();
-                ivPicture.getHitRect(rect);
+                
                 ivPicture.setDrawingCacheEnabled(true);
                 ivPicture.buildDrawingCache();
                 Bitmap bitmap = ivPicture.getDrawingCache();
-                if (y >= height) {
-                    textToSpeech.speak("Estás fuera de la imagen", TextToSpeech.QUEUE_FLUSH, null, null);
-                    return true;
+                if (y >= ivPicture.getHeight()) {
+                    msg = "Estás fuera de la imagen";
                 } else {
                     int pixel = bitmap.getPixel(x, y);
                     if (Color.alpha(pixel) == 0) {
-                        textToSpeech.speak("Estás fuera de la imagen", TextToSpeech.QUEUE_FLUSH, null, null);
-                        return true;
+                        msg ="Estás fuera de la imagen";
                     } else {
-                        textToSpeech.speak(identificador.getObject(x, y), TextToSpeech.QUEUE_FLUSH, null, null);
-                    }
-                    if (rect.contains(x, y)) { //del imagavew general
-                    } else {
+                        msg = identificador.getObject(x, y);
+                        /*
+                        String imagencortada = imagen.cortar(identificador.getCoords(x,y));
+                        HiloDescrip objeto = new HiloDescrip(imagencortada);
+                        objeto.start();
+                        objeto.join();
+                        msg = objeto.getTexto();*/
                     }
                 }
-
-
+                textToSpeech.speak(msg, TextToSpeech.QUEUE_FLUSH, null, null);
             } catch (JSONException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
