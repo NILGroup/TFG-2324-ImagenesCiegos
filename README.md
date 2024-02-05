@@ -23,10 +23,6 @@ Aplicación móvil para facilitar la interpretación de imágenes a personas con
 ```bash
   installar app-debug.apk
 ```
-    
-## Demo
-<img src="https://drive.google.com/uc?export=view&id=1JqDVLDFsc4Zgtz9tkpUhtgsxI7Yld-HY"
-     alt="Demo" width=25% height=25%>
 
 ## API References
 
