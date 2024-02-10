@@ -1,27 +1,23 @@
 package com.android.app.Hilo;
 
-import android.speech.tts.TextToSpeech;
-
-import com.android.app.Imagen;
-import com.android.app.Traduccion;
-
 import java.io.IOException;
 
 public class HiloDescrip extends Hilo{
 
-    private Traduccion descripFinal;
+    private String texto;
+    private final String subImageBase64;
 
-    public HiloDescrip(Imagen imagen) {
-        super(imagen);
+    public HiloDescrip(String subImageBase64) {
+        super();
+        this.subImageBase64 = subImageBase64;
     }
 
-    public Traduccion getDescripFinal() {return descripFinal;}
+    public String getTexto() {return texto;}
+
     public void run(){
-        firebase.callImagen(imagen.getBase64()).addOnCompleteListener(task -> {
+        firebase.callImagen(subImageBase64).addOnCompleteListener(task -> {
             try {
-                firebase.translatedImage(task.getResult().getTexto()).addOnCompleteListener(task2 -> {
-                    descripFinal = task2.getResult();
-                });
+                firebase.translatedImage(task.getResult().getTexto()).addOnCompleteListener(task2 -> texto = task2.getResult().getTexto());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

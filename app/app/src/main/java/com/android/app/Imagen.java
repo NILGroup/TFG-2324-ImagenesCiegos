@@ -3,7 +3,9 @@ package com.android.app;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapRegionDecoder;
 import android.graphics.ImageDecoder;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.widget.ImageView;
 
@@ -28,8 +30,6 @@ public class Imagen {
         this.contexto=contexto;
         codBase64(imageUri);
     }
-
-    public String getImageUri() {return imageUri.toString();}
     public String getBase64() {return base64;}
 
     private void codBase64(Uri uri) throws IOException {
@@ -47,12 +47,13 @@ public class Imagen {
         inputStream.close();
     }
 
-    public void rotarImagen(Intent data, ImageView ivPicture) throws IOException {
-        sacarRelacion(data);
-        if (sacarRelacion(data))
+    public boolean rotarImagen(Intent data, ImageView ivPicture) throws IOException {
+        boolean giro = sacarRelacion(data);
+        if (giro)
             Glide.with(contexto.getApplicationContext()).load(data.getData()).apply(new RequestOptions().transform(new Rotate(90))) // Rotación de 90 grados
                     .into(ivPicture);
         else ivPicture.setImageURI(data.getData());
+        return giro;
     }
     private boolean sacarRelacion(Intent data) throws IOException { //Ve si una imagen tiene que ir en vertical o en horizontal
         ImageDecoder.Source source = ImageDecoder.createSource(contexto.getContentResolver(), Objects.requireNonNull(data.getData()));
@@ -63,7 +64,37 @@ public class Imagen {
         return ratio<1;
     }
 
-    public void cortarImagen(Bitmap b, int[] coordenadas, ImageView ivPicture) { // Recortar el objeto deseado
-        ivPicture.setImageBitmap(Bitmap.createBitmap(b, coordenadas[0], coordenadas[1], coordenadas[2], coordenadas[3]));
+    public String cortar(int coords[]) {
+        // Decodificar la cadena base64 en un array de bytes
+        byte[] imageBytes = Base64.getDecoder().decode(base64);
+
+        // Crear una región decodificadora para la imagen completa
+        BitmapRegionDecoder regionDecoder = null;
+        try {
+            regionDecoder = BitmapRegionDecoder.newInstance(imageBytes, 0, imageBytes.length, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Crear un rectángulo que define la región a cortar
+        Rect cropRect = new Rect(coords[0], coords[1], coords[0] + coords[2], coords[1] + coords[3]);
+
+        // Decodificar la región específica
+        Bitmap croppedBitmap = regionDecoder.decodeRegion(cropRect, null);
+
+        // Convertir el bitmap recortado a una cadena Base64
+        String croppedBase64 = encodeBitmapToBase64(croppedBitmap);
+
+        // Liberar recursos
+        regionDecoder.recycle();
+        croppedBitmap.recycle();
+
+        return croppedBase64;
+    }
+    private String encodeBitmapToBase64(Bitmap bitmap) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+        return Base64.getEncoder().encodeToString(byteArray);
     }
 }

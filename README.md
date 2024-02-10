@@ -23,15 +23,22 @@ Aplicación móvil para facilitar la interpretación de imágenes a personas con
 ```bash
   installar app-debug.apk
 ```
-    
-## Demo
-<img src="https://drive.google.com/uc?export=view&id=1JqDVLDFsc4Zgtz9tkpUhtgsxI7Yld-HY"
-     alt="Demo" width=25% height=25%>
+
+## API References
+
+- [SalesForce Captioning Model](https://huggingface.co/Salesforce/blip-image-captioning-large)
+- [Facebook Object Detection Model](https://huggingface.co/facebook/detr-resnet-50)
+- [Helsinki Translation Model](https://huggingface.co/Helsinki-NLP/opus-mt-en-es)
+
+<img src="https://drive.google.com/uc?export=view&id=1Kkh_AbUtj3N8yPZTo3FoBWMthZAKAfE0"
+     alt="Demo" width=75% height=75%>
 
 ## Diagrama UML
 
+<p align="center">
 <img src="https://drive.google.com/uc?export=view&id=1Nj8sIcWrKyFu4c253rE7EhJu-YLlkVB2"
-     alt="Diagrama" width=50% height=50%>
+     alt="Diagrama" width=35% height=35%>
+</p>
 
 ## Autores
 
@@ -43,6 +50,12 @@ Aplicación móvil para facilitar la interpretación de imágenes a personas con
 ## Proyectos relacionados
 
 [TFG-2223-DescripcionImagenesCiegos](https://github.com/NILGroup/TFG-2223-DescripcionImagenesCiegos)
+
+<p align="center">
+ <img src="https://opengraph.githubassets.com/2a79fb4a7f49ddda9164f08148c20c7f21dcd5bd3ff4459cb869772a3f2e0f39/NILGroup/TFG-2223-DescripcionImagenesCiegos"
+     alt="Demo" width=75% height=75%>
+</p>
+
 ## Licencia
 
 TFG-2324-ImagenesCiegos © 2024 is licensed under [Attribution-NonCommercial-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1).

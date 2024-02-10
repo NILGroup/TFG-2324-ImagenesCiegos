@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -21,33 +20,33 @@ import android.widget.ImageView;
 
 import android.speech.tts.TextToSpeech;
 
+import com.android.app.Hilo.Hilo;
 import com.android.app.Hilo.HiloDescrip;
 import com.android.app.Hilo.HiloTag;
 
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
+
+    //Seleccion de imagen
     private static final int CAMERA_PERMISSION_CODE = 223;
     private static final String TAG = "Numero Objetos detectados";
-
     ActivityResultLauncher<Intent> cameraLauncher;
     ActivityResultLauncher<Intent> galleryLauncher;
-    String textTo;
 
+    //TextToSpeech
+    private String textTo;
     private TextToSpeech textToSpeech;
-
-    //TODO Apartir de aquí las variables estan colocadas
+    //Firebase
     private FireFunctions firebase;
     //Variables xml
     private ImageView ivPicture;
-    private ImageButton btnChoosePicture;
-    private ImageButton decirDescripcion;
 
     //Objetos necesarios
     private Imagen imagen;
-    private Identificador identificador;
     private HiloTag tags;
 
     @Override
@@ -55,23 +54,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ivPicture = findViewById(R.id.ivPicture);
-        decirDescripcion = findViewById(R.id.decirDescripcion);
-        btnChoosePicture = findViewById(R.id.btnChoosePicture);
+        ImageButton decirDescripcion = findViewById(R.id.decirDescripcion);
+        ImageButton btnChoosePicture = findViewById(R.id.btnChoosePicture);
         firebase = new FireFunctions();
-        //Inicializar el text To speech
-        textToSpeech = new TextToSpeech(this, status -> {
-            if (status == TextToSpeech.SUCCESS) {
-                // Text-to-Speech está listo para su uso
-            } else {
-                // Algo salió mal, Text-to-Speech no está disponible
-                Log.e("TextToSpeech", "Initialization failed");
-            }
-        });
+        textToSpeech = new TextToSpeech(this, status -> {});
 
         cameraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             Intent data = result.getData();
             try {
-                Bitmap photo = (Bitmap) data.getExtras().get("data");
+                Bitmap photo = (Bitmap) Objects.requireNonNull(Objects.requireNonNull(data).getExtras()).get("data");
                 ivPicture.setImageBitmap(photo);
                 tratamientoImagen(data);
             } catch (Exception e) {
@@ -83,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         galleryLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             Intent data = result.getData();
             try {
-                tratamientoImagen(data);
+                tratamientoImagen(Objects.requireNonNull(data));
             } catch (Exception e) {
                 Log.d(TAG, "onActivityResult:" + e.getMessage());
             }
@@ -106,77 +97,57 @@ public class MainActivity extends AppCompatActivity {
             });
             builder.show();
         });
-        //TODO: Sincronizarlo bien para que haya respuesta o hacer que diga que aun no hay respuesta
-        //algo de esso (añadirlo al onComplete alomejor)
         decirDescripcion.setOnClickListener(v -> textToSpeech.speak(textTo, TextToSpeech.QUEUE_FLUSH, null, null));
     }
 
     public boolean onTouchEvent(MotionEvent event) {
-        int x = (int) event.getX();
-        int y = (int) event.getY();
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN :
-                // Acción cuando se presiona la pantalla
-                try {
-                    tags.join();
-                    identificador = tags.getIdentificador();
-
-                    int width = ivPicture.getWidth();
-                    int height = ivPicture.getHeight();
-
-                    ivPicture.setEnabled(false);
-
-                    Rect rect = new Rect();
-                    ivPicture.getHitRect(rect);
-                    ivPicture.setDrawingCacheEnabled(true);
-                    ivPicture.buildDrawingCache();
-                    Bitmap bitmap = ivPicture.getDrawingCache();
-                    if(y>= height){
-                        textToSpeech.speak("Estás fuera de la imagen", TextToSpeech.QUEUE_FLUSH, null, null);
-                        return true;
-                    }else{
-                        int pixel = bitmap.getPixel(x, y);
-                        if (Color.alpha(pixel) == 0) {
-                            textToSpeech.speak("Estás fuera de la imagen", TextToSpeech.QUEUE_FLUSH, null, null);
-                            return true;
-                        }else{
-                            textToSpeech.speak(identificador.getObject(x,y), TextToSpeech.QUEUE_FLUSH, null, null);
-                        }
-                        if (rect.contains(x, y)) { //del imagavew general
-                        } else {
-                        }
+        String msg;
+        if (imagen!=null && event.getAction() == MotionEvent.ACTION_DOWN) {
+            int x = (int) event.getX();
+            int y = (int) event.getY();
+            try {
+                tags.join();
+                Identificador identificador = tags.getIdentificador();
+                
+                ivPicture.setDrawingCacheEnabled(true);
+                ivPicture.buildDrawingCache();
+                Bitmap bitmap = ivPicture.getDrawingCache();
+                if (y >= ivPicture.getHeight()) {
+                    msg = "Estás fuera de la imagen";
+                } else {
+                    int pixel = bitmap.getPixel(x, y);
+                    if (Color.alpha(pixel) == 0) {
+                        msg ="Estás fuera de la imagen";
+                    } else {
+                        msg = identificador.getObject(x, y);
+                        /*
+                        String imagencortada = imagen.cortar(identificador.getCoords(x,y));
+                        HiloDescrip objeto = new HiloDescrip(imagencortada);
+                        objeto.start();
+                        objeto.join();
+                        msg = objeto.getTexto();*/
                     }
-
-
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
                 }
-                ;
-                break;
-            case MotionEvent.ACTION_MOVE:
-                // Acción cuando se mueve el dedo sobre la pantalla
-
-                break;
-            case MotionEvent.ACTION_UP:
-                // Acción cuando se levanta el dedo de la pantalla
-                break;
+                textToSpeech.speak(msg, TextToSpeech.QUEUE_FLUSH, null, null);
+            } catch (JSONException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
-
         return true;
     }
 
-    private void tratamientoImagen(Intent data) throws IOException, InterruptedException {
+    private void tratamientoImagen(Intent data) throws IOException {
         imagen = new Imagen(MainActivity.this,data.getData());
-        imagen.rotarImagen(data,ivPicture);//Rota si es necesario y muestra la imagen
+        if(imagen.rotarImagen(data,ivPicture)){
+            textToSpeech.speak("La imagen está en horizontal", TextToSpeech.QUEUE_FLUSH, null, null);
+        }
         tags = new HiloTag(imagen);
         tags.start();
         firebase.callImagen(imagen.getBase64()).addOnCompleteListener(task -> {
             try {
                 firebase.translatedImage(task.getResult().getTexto()).addOnCompleteListener(task2 -> {
                     textTo = task2.getResult().getTexto();
-                    textToSpeech.speak(textTo, TextToSpeech.QUEUE_FLUSH, null, null);
+                    textToSpeech.speak(textTo, TextToSpeech.QUEUE_ADD, null, null);
                 });
             } catch (IOException e) {
                 throw new RuntimeException(e);
