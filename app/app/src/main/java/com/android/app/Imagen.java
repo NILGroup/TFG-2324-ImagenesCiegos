@@ -24,6 +24,11 @@ public class Imagen {
     private String base64;
     protected Context contexto;
 
+    private int height,width;
+
+    private boolean giro;
+
+
     public Imagen(Context contexto, Uri imageUri) throws IOException {
 
         this.imageUri=imageUri;
@@ -31,6 +36,9 @@ public class Imagen {
         codBase64(imageUri);
     }
     public String getBase64() {return base64;}
+    public int getHeight() {return height;}
+    public int getWidth() {return width;}
+    public boolean getGiro() {return giro;}
 
     private void codBase64(Uri uri) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -48,7 +56,7 @@ public class Imagen {
     }
 
     public boolean rotarImagen(Intent data, ImageView ivPicture) throws IOException {
-        boolean giro = sacarRelacion(data);
+        giro = sacarRelacion(data);
         if (giro)
             Glide.with(contexto.getApplicationContext()).load(data.getData()).apply(new RequestOptions().transform(new Rotate(90))) // Rotación de 90 grados
                     .into(ivPicture);
@@ -58,13 +66,13 @@ public class Imagen {
     private boolean sacarRelacion(Intent data) throws IOException { //Ve si una imagen tiene que ir en vertical o en horizontal
         ImageDecoder.Source source = ImageDecoder.createSource(contexto.getContentResolver(), Objects.requireNonNull(data.getData()));
         Bitmap bitmap = ImageDecoder.decodeBitmap(source);
-        int imageHeight = bitmap.getHeight();
-        int imageWidth = bitmap.getWidth();
-        int ratio = imageHeight / imageWidth;
+        height = bitmap.getHeight();
+        width = bitmap.getWidth();
+        int ratio = height / width;
         return ratio<1;
     }
 
-    public String cortar(int coords[]) {
+    public String cortar(int[] coords) {
         // Decodificar la cadena base64 en un array de bytes
         byte[] imageBytes = Base64.getDecoder().decode(base64);
 
@@ -80,6 +88,7 @@ public class Imagen {
         Rect cropRect = new Rect(coords[0], coords[1], coords[0] + coords[2], coords[1] + coords[3]);
 
         // Decodificar la región específica
+        assert regionDecoder != null;
         Bitmap croppedBitmap = regionDecoder.decodeRegion(cropRect, null);
 
         // Convertir el bitmap recortado a una cadena Base64
