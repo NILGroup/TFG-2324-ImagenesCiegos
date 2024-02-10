@@ -8,7 +8,7 @@ async function descriptor(data) {
 	const response = await fetch(
 		"https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-large",
 		{
-			headers: { Authorization: "Bearer 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" },
+			headers: { Authorization: "Bearer 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" },
 			method: "POST",
 			body: data,
 		}
@@ -21,7 +21,7 @@ async function tagging(data) {
 	const response = await fetch(
 		"https://api-inference.huggingface.co/models/facebook/detr-resnet-50",
 		{
-			headers: { Authorization: "Bearer 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" },
+			headers: { Authorization: "Bearer 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" },
 			method: "POST",
 			body: data,
 		}
@@ -34,7 +34,7 @@ async function query(data) {
 	const response = await fetch(
 		"https://api-inference.huggingface.co/models/Helsinki-NLP/opus-mt-en-es",
 		{
-			headers: { Authorization: "Bearer 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" },
+			headers: { Authorization: "Bearer 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" },
 			method: "POST",
 			body: JSON.stringify(data),
 		}
