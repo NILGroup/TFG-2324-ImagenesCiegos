@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -20,8 +21,6 @@ import android.widget.ImageView;
 
 import android.speech.tts.TextToSpeech;
 
-import com.android.app.Hilo.Hilo;
-import com.android.app.Hilo.HiloDescrip;
 import com.android.app.Hilo.HiloTag;
 
 import org.json.JSONException;
@@ -44,11 +43,13 @@ public class MainActivity extends AppCompatActivity {
     private FireFunctions firebase;
     //Variables xml
     private ImageView ivPicture;
+    private BoundingBox bBox;
 
     //Objetos necesarios
     private Imagen imagen;
     private HiloTag tags;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,48 +99,57 @@ public class MainActivity extends AppCompatActivity {
             builder.show();
         });
         decirDescripcion.setOnClickListener(v -> textToSpeech.speak(textTo, TextToSpeech.QUEUE_FLUSH, null, null));
-    }
+        ivPicture.setOnTouchListener((v, event) -> {
+            String msg;
+            if (imagen!=null && event.getAction() == MotionEvent.ACTION_DOWN) {
+                int x = (int) event.getX();
+                int y = (int) event.getY();
+                try {
+                    tags.join();
+                    Identificador identificador = tags.getIdentificador();
 
-    public boolean onTouchEvent(MotionEvent event) {
-        String msg;
-        if (imagen!=null && event.getAction() == MotionEvent.ACTION_DOWN) {
-            int x = (int) event.getX();
-            int y = (int) event.getY();
-            try {
-                tags.join();
-                Identificador identificador = tags.getIdentificador();
-                
-                ivPicture.setDrawingCacheEnabled(true);
-                ivPicture.buildDrawingCache();
-                Bitmap bitmap = ivPicture.getDrawingCache();
-                if (y >= ivPicture.getHeight()) {
-                    msg = "Estás fuera de la imagen";
-                } else {
-                    int pixel = bitmap.getPixel(x, y);
-                    if (Color.alpha(pixel) == 0) {
-                        msg ="Estás fuera de la imagen";
+                    ivPicture.setDrawingCacheEnabled(true);
+                    ivPicture.buildDrawingCache();
+                    Bitmap bitmap = ivPicture.getDrawingCache();
+                    if (y >= ivPicture.getHeight()) {
+                        msg = "Estás fuera de la imagen";
                     } else {
-                        msg = identificador.getObject(x, y);
-                        /*
-                        String imagencortada = imagen.cortar(identificador.getCoords(x,y));
-                        HiloDescrip objeto = new HiloDescrip(imagencortada);
-                        objeto.start();
-                        objeto.join();
-                        msg = objeto.getTexto();*/
+                        int pixel = bitmap.getPixel(x, y);
+                        if (Color.alpha(pixel) == 0) {
+                            msg ="Estás fuera de la imagen";
+                        } else {
+                            int ajuste = 1 ;
+                            if(imagen.isGiro()){
+                                ajuste = ivPicture.getHeight()/imagen.getHeight();
+                            }
+                            else{
+                                ajuste = ivPicture.getWidth()/imagen.getWidth();
+                            }
+                            x /= ajuste;
+                            y /= ajuste;
+                            msg = identificador.getObject(x, y);
+                            /*
+                            String imagencortada = imagen.cortar(identificador.getCoords(x,y));
+                            HiloDescrip objeto = new HiloDescrip(imagencortada);
+                            objeto.start();
+                            objeto.join();
+                            msg = objeto.getTexto();*/
+                        }
                     }
+                    textToSpeech.speak(msg, TextToSpeech.QUEUE_FLUSH, null, null);
+                } catch (JSONException | InterruptedException e) {
+                    throw new RuntimeException(e);
                 }
-                textToSpeech.speak(msg, TextToSpeech.QUEUE_FLUSH, null, null);
-            } catch (JSONException | InterruptedException e) {
-                throw new RuntimeException(e);
             }
-        }
-        return true;
+            return true;
+        });
     }
 
     private void tratamientoImagen(Intent data) throws IOException {
         imagen = new Imagen(MainActivity.this,data.getData());
         if(imagen.rotarImagen(data,ivPicture)){
             textToSpeech.speak("La imagen está en horizontal", TextToSpeech.QUEUE_FLUSH, null, null);
+
         }
         tags = new HiloTag(imagen);
         tags.start();

@@ -22,6 +22,9 @@ import java.util.Objects;
 public class Imagen {
     protected Uri imageUri;
     private String base64;
+    private int height,width;
+
+    private boolean giro;
     protected Context contexto;
 
     public Imagen(Context contexto, Uri imageUri) throws IOException {
@@ -31,6 +34,9 @@ public class Imagen {
         codBase64(imageUri);
     }
     public String getBase64() {return base64;}
+    public int getHeight() {return height;}
+    public int getWidth() { return width;}
+    public boolean isGiro() {return giro;}
 
     private void codBase64(Uri uri) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -48,7 +54,7 @@ public class Imagen {
     }
 
     public boolean rotarImagen(Intent data, ImageView ivPicture) throws IOException {
-        boolean giro = sacarRelacion(data);
+        giro = sacarRelacion(data);
         if (giro)
             Glide.with(contexto.getApplicationContext()).load(data.getData()).apply(new RequestOptions().transform(new Rotate(90))) // Rotación de 90 grados
                     .into(ivPicture);
@@ -58,9 +64,9 @@ public class Imagen {
     private boolean sacarRelacion(Intent data) throws IOException { //Ve si una imagen tiene que ir en vertical o en horizontal
         ImageDecoder.Source source = ImageDecoder.createSource(contexto.getContentResolver(), Objects.requireNonNull(data.getData()));
         Bitmap bitmap = ImageDecoder.decodeBitmap(source);
-        int imageHeight = bitmap.getHeight();
-        int imageWidth = bitmap.getWidth();
-        int ratio = imageHeight / imageWidth;
+        height = bitmap.getHeight();
+        width = bitmap.getWidth();
+        int ratio = height / width;
         return ratio<1;
     }
 
