@@ -14,15 +14,16 @@ public class Identificador {
     }
 
     public String getObject(int x, int y) throws JSONException {
-
+        String ret = "";
         for(int i = 0; i<json.length(); i++){
             if(estaContenido(json.getJSONObject(i).getJSONObject("box"),x,y)){
-                //TODO mas de un objeto
-                //TODO Distancia Manhattan
-                return json.getJSONObject(i).getString("label");
+                ret = json.getJSONObject(i).getString("label") + ",";
             }
         }
-        return "No hay ningún objeto";
+        if(ret =="")
+            return "No hay ningún objeto";
+        else
+            return ret;
     }
 
     public int[] getCoords(int x, int y) throws JSONException {
