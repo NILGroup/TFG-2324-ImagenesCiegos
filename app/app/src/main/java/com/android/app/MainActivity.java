@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     //Objetos necesarios
     private Imagen imagen;
     private HiloTag tags;
+    RectangleOverlay rectangleOverlay;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -57,6 +58,9 @@ public class MainActivity extends AppCompatActivity {
         ivPicture = findViewById(R.id.ivPicture);
         ImageButton decirDescripcion = findViewById(R.id.decirDescripcion);
         ImageButton btnChoosePicture = findViewById(R.id.btnChoosePicture);
+
+        rectangleOverlay = findViewById(R.id.rectangleOverlay);
+
         firebase = new FireFunctions();
         textToSpeech = new TextToSpeech(this, status -> {});
 
@@ -153,6 +157,20 @@ public class MainActivity extends AppCompatActivity {
         }
         tags = new HiloTag(imagen);
         tags.start();
+        int[] coords = new int [4];
+        int ajuste = 1 ;
+        if(imagen.isGiro()){
+            ajuste = ivPicture.getHeight()/imagen.getHeight();
+        }
+        else{
+            ajuste = ivPicture.getWidth()/imagen.getWidth();
+        }
+
+
+        int iguala = (ivPicture.getHeight()-imagen.getHeight()*ajuste)/2;
+        coords[0]=41*ajuste;coords[1]=11*ajuste+iguala;coords[2]=139*ajuste;coords[3]=139*ajuste+iguala;
+        rectangleOverlay.setCoordinates(coords);
+
         firebase.callImagen(imagen.getBase64()).addOnCompleteListener(task -> {
             try {
                 firebase.translatedImage(task.getResult().getTexto()).addOnCompleteListener(task2 -> {

@@ -25,6 +25,7 @@ public class HiloTag extends Hilo{
                         firebase.translatedImage(identificador.getLabels()).addOnCompleteListener(task2 -> {
                             try {
                                 identificador.changeLabels(task2.getResult().getTexto());
+                               // identificador.dibujarBoundingBoxes(task2.getResult().getTexto());
                             } catch (JSONException e) {
                                 throw new RuntimeException(e);
                             }
@@ -35,4 +36,6 @@ public class HiloTag extends Hilo{
                 }
         );
     }
+
+
 }
