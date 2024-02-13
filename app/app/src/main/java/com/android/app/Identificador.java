@@ -4,7 +4,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class Identificador {
@@ -65,10 +67,27 @@ public class Identificador {
 
         String[] lista = input.replaceAll("\"","").split(",");
         List<String> newLabels = Arrays.asList(lista);
+        List<String> newNewLabels = new ArrayList<>();
+        
+        //Para añadir sufijo cuaando dos objetos tengan el mismo nombre
+        for(int j=0;j<json.length();j++){
+                String nuevaEtiqueta = newLabels.get(j);
+                if (newNewLabels.contains(nuevaEtiqueta +1)) {
+                    int sufijo = 1;
+                    while (newNewLabels.contains(nuevaEtiqueta + sufijo)) {
+                        sufijo++;
+                    }
+                    nuevaEtiqueta = nuevaEtiqueta + sufijo;
+                }else{
+                    nuevaEtiqueta +="1";
+                }
+                newNewLabels.add(nuevaEtiqueta);
+        }
 
         for(int i = 0; i<json.length(); i++){
-            json.getJSONObject(i).put("label", newLabels.get(i));
+            json.getJSONObject(i).put("label", newNewLabels.get(i));
         }
+
     }
 
     private boolean estaContenido(JSONObject box, int x, int y) throws JSONException {
