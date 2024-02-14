@@ -7,13 +7,16 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class RectangleOverlay extends View {
 
     private Paint paint;
-    private int[] coordinates;
+    private List<int[]> coordinatesList;
 
-    public RectangleOverlay(Context context,AttributeSet attributeSet) {
-        super(context,attributeSet);
+    public RectangleOverlay(Context context, AttributeSet attributeSet) {
+        super(context, attributeSet);
         init();
     }
 
@@ -22,10 +25,11 @@ public class RectangleOverlay extends View {
         paint.setColor(Color.RED);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5); // Grosor del borde del rectángulo
+        coordinatesList = new ArrayList<>();
     }
 
-    public void setCoordinates(int[] coordinates) {
-        this.coordinates = coordinates;
+    public void addCoordinates(int[] coordinates) {
+        coordinatesList.add(coordinates);
         invalidate(); // Vuelve a dibujar la vista
     }
 
@@ -33,10 +37,11 @@ public class RectangleOverlay extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        if (coordinates != null && coordinates.length == 4) {
-            // Dibuja el rectángulo utilizando las coordenadas
-
-            canvas.drawRect(coordinates[0], coordinates[1], coordinates[2], coordinates[3], paint);
+        for (int[] coordinates : coordinatesList) {
+            if (coordinates.length == 4) {
+                // Dibuja el rectángulo utilizando las coordenadas
+                canvas.drawRect(coordinates[0], coordinates[1], coordinates[2], coordinates[3], paint);
+            }
         }
     }
 }

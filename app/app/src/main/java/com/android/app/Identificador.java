@@ -1,16 +1,18 @@
 package com.android.app;
 
+import android.content.Context;
+import android.util.AttributeSet;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 public class Identificador {
-    RectangleOverlay rectangleOverlay;
+
     protected JSONArray json;
     public Identificador(String input) throws JSONException {
         json = new JSONArray(input);
@@ -29,16 +31,7 @@ public class Identificador {
         else
             return ret;
     }
-    public void dibujarBoundingBoxes() throws JSONException {
-        int[] ret = new int[4];;
-        for(int i = 0; i<json.length(); i++){
-            ret[0] = json.getJSONObject(i).getJSONObject("box").getInt("xmin");
-            ret[1] = json.getJSONObject(i).getJSONObject("box").getInt("ymin");
-            ret[2] = json.getJSONObject(i).getJSONObject("box").getInt("xmax");
-            ret[3] = json.getJSONObject(i).getJSONObject("box").getInt("ymax");
-        rectangleOverlay.setCoordinates(ret);
-        }
-    }
+
     public int[] getCoords(int x, int y) throws JSONException {
 
         int[] ret = new int[4];
@@ -52,6 +45,9 @@ public class Identificador {
             }
         }
         return ret;
+    }
+    public JSONArray getJsons(){
+        return json;
     }
 
     public String getLabels() throws JSONException {
@@ -68,18 +64,16 @@ public class Identificador {
         String[] lista = input.replaceAll("\"","").split(",");
         List<String> newLabels = Arrays.asList(lista);
         List<String> newNewLabels = new ArrayList<>();
-        
+
         //Para añadir sufijo cuaando dos objetos tengan el mismo nombre
         for(int j=0;j<json.length();j++){
                 String nuevaEtiqueta = newLabels.get(j);
-                if (newNewLabels.contains(nuevaEtiqueta +1)) {
+                if (newNewLabels.contains(nuevaEtiqueta)) {
                     int sufijo = 1;
                     while (newNewLabels.contains(nuevaEtiqueta + sufijo)) {
                         sufijo++;
                     }
                     nuevaEtiqueta = nuevaEtiqueta + sufijo;
-                }else{
-                    nuevaEtiqueta +="1";
                 }
                 newNewLabels.add(nuevaEtiqueta);
         }
@@ -91,6 +85,7 @@ public class Identificador {
     }
 
     private boolean estaContenido(JSONObject box, int x, int y) throws JSONException {
+
         return x>box.getInt("xmin") && x<box.getInt("xmax")
                 &&
                 y>box.getInt("ymin") && y<box.getInt("ymax");

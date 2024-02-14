@@ -8,12 +8,14 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.ImageButton;
@@ -23,7 +25,9 @@ import android.speech.tts.TextToSpeech;
 
 import com.android.app.Hilo.HiloTag;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -111,7 +115,6 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     tags.join();
                     Identificador identificador = tags.getIdentificador();
-
                     ivPicture.setDrawingCacheEnabled(true);
                     ivPicture.buildDrawingCache();
                     Bitmap bitmap = ivPicture.getDrawingCache();
@@ -129,8 +132,14 @@ public class MainActivity extends AppCompatActivity {
                             else{
                                 ajuste = ivPicture.getWidth()/imagen.getWidth();
                             }
+                            int iguala = (ivPicture.getHeight()-imagen.getHeight()*ajuste)/2;
                             x /= ajuste;
                             y /= ajuste;
+                            //Para pintar las bounding boxes
+                            for(int i=0;i<identificador.getJsons().length();i++){
+                                dibujarBoundingBoxes(ajuste,iguala,identificador.getJsons().getJSONObject(i));
+                            }
+
                             msg = identificador.getObject(x, y);
                             /*
                             String imagencortada = imagen.cortar(identificador.getCoords(x,y));
@@ -148,6 +157,15 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
     }
+    public void dibujarBoundingBoxes(int ajuste, int iguala, JSONObject o) throws JSONException {
+        int[] ret = new int[4];
+            ret[0] = o.getJSONObject("box").getInt("xmin")*ajuste;
+            ret[1] = o.getJSONObject("box").getInt("ymin")*ajuste + iguala;
+            ret[2] = o.getJSONObject("box").getInt("xmax")*ajuste;
+            ret[3] = o.getJSONObject("box").getInt("ymax")*ajuste + iguala;
+
+            rectangleOverlay.addCoordinates(ret);
+    }
 
     private void tratamientoImagen(Intent data) throws IOException {
         imagen = new Imagen(MainActivity.this,data.getData());
@@ -157,20 +175,6 @@ public class MainActivity extends AppCompatActivity {
         }
         tags = new HiloTag(imagen);
         tags.start();
-        int[] coords = new int [4];
-        int ajuste = 1 ;
-        if(imagen.isGiro()){
-            ajuste = ivPicture.getHeight()/imagen.getHeight();
-        }
-        else{
-            ajuste = ivPicture.getWidth()/imagen.getWidth();
-        }
-
-
-        int iguala = (ivPicture.getHeight()-imagen.getHeight()*ajuste)/2;
-        coords[0]=41*ajuste;coords[1]=11*ajuste+iguala;coords[2]=139*ajuste;coords[3]=139*ajuste+iguala;
-        rectangleOverlay.setCoordinates(coords);
-
         firebase.callImagen(imagen.getBase64()).addOnCompleteListener(task -> {
             try {
                 firebase.translatedImage(task.getResult().getTexto()).addOnCompleteListener(task2 -> {
