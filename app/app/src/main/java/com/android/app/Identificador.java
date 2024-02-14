@@ -19,10 +19,10 @@ public class Identificador {
 
     }
 
-    public String getObject(int x, int y) throws JSONException {
+    public String getObject(int x, int y,int ajuste, int iguala) throws JSONException {
         String ret = "";
         for(int i = 0; i<json.length(); i++){
-            if(estaContenido(json.getJSONObject(i).getJSONObject("box"),x,y)){
+            if(estaContenido(json.getJSONObject(i).getJSONObject("box"),x,y,ajuste, iguala)){
                 ret += json.getJSONObject(i).getString("label") + ",";
             }
         }
@@ -32,6 +32,7 @@ public class Identificador {
             return ret;
     }
 
+    /*
     public int[] getCoords(int x, int y) throws JSONException {
 
         int[] ret = new int[4];
@@ -45,7 +46,7 @@ public class Identificador {
             }
         }
         return ret;
-    }
+    }*/
     public JSONArray getJsons(){
         return json;
     }
@@ -84,11 +85,13 @@ public class Identificador {
 
     }
 
-    private boolean estaContenido(JSONObject box, int x, int y) throws JSONException {
+    private boolean estaContenido(JSONObject box, int x, int y,int ajuste, int iguala) throws JSONException {
+       int xmin = box.getInt("xmin")*ajuste;
+       int ymin = box.getInt("ymin")*ajuste + iguala;
+       int xmax = box.getInt("xmax")*ajuste;
+       int ymax = box.getInt("ymax")*ajuste + iguala;
 
-        return x>box.getInt("xmin") && x<box.getInt("xmax")
-                &&
-                y>box.getInt("ymin") && y<box.getInt("ymax");
+        return x> xmin && x<xmax &&  y> ymin && y<ymax;
     }
 
 }

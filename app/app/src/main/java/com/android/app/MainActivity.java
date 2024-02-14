@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
                                 dibujarBoundingBoxes(ajuste,iguala,identificador.getJsons().getJSONObject(i));
                             }
 
-                            msg = identificador.getObject(x, y);
+                            msg = identificador.getObject(x, y,ajuste,iguala);
                             /*
                             String imagencortada = imagen.cortar(identificador.getCoords(x,y));
                             HiloDescrip objeto = new HiloDescrip(imagencortada);
