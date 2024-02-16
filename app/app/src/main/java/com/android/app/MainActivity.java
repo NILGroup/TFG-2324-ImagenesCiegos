@@ -126,18 +126,23 @@ public class MainActivity extends AppCompatActivity {
                             msg ="Estás fuera de la imagen";
                         } else {
                             int ajuste = 1 ;
+                            int iguala;
                             if(imagen.isGiro()){
                                 ajuste = ivPicture.getHeight()/imagen.getHeight();
+
+                                iguala = (ivPicture.getWidth()-imagen.getWidth()*ajuste)/2;
                             }
                             else{
                                 ajuste = ivPicture.getWidth()/imagen.getWidth();
+
+                                iguala = (ivPicture.getHeight()-imagen.getHeight()*ajuste)/2;
                             }
-                            int iguala = (ivPicture.getHeight()-imagen.getHeight()*ajuste)/2;
+
                             x /= ajuste;
                             y /= ajuste;
                             //Para pintar las bounding boxes
                             for(int i=0;i<identificador.getJsons().length();i++){
-                                dibujarBoundingBoxes(ajuste,iguala,identificador.getJsons().getJSONObject(i));
+                                dibujarBoundingBoxes(ajuste,iguala,identificador.getJsons().getJSONObject(i),imagen.isGiro());
                             }
 
                             msg = identificador.getObject(x, y,ajuste,iguala);
@@ -157,12 +162,20 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
     }
-    public void dibujarBoundingBoxes(int ajuste, int iguala, JSONObject o) throws JSONException {
+    public void dibujarBoundingBoxes(int ajuste, int iguala, JSONObject o,boolean giro) throws JSONException {
         int[] ret = new int[4];
+        if(!giro){
             ret[0] = o.getJSONObject("box").getInt("xmin")*ajuste;
             ret[1] = o.getJSONObject("box").getInt("ymin")*ajuste + iguala;
             ret[2] = o.getJSONObject("box").getInt("xmax")*ajuste;
             ret[3] = o.getJSONObject("box").getInt("ymax")*ajuste + iguala;
+        }else{
+            ret[0] = o.getJSONObject("box").getInt("xmin")*ajuste + iguala;
+            ret[1] = o.getJSONObject("box").getInt("ymin")*ajuste;
+            ret[2] = o.getJSONObject("box").getInt("xmax")*ajuste + iguala;
+            ret[3] = o.getJSONObject("box").getInt("ymax")*ajuste;
+        }
+
 
             rectangleOverlay.addCoordinates(ret);
     }
