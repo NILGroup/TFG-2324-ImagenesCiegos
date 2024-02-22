@@ -36,7 +36,6 @@ public class RectangleOverlay extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
         for (int[] coordinates : coordinatesList) {
             if (coordinates.length == 4) {
                 // Dibuja el rectángulo utilizando las coordenadas

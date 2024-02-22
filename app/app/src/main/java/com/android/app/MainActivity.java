@@ -14,6 +14,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -54,6 +55,11 @@ public class MainActivity extends AppCompatActivity {
     //Objetos necesarios
     private Imagen imagen;
     private HiloTag tags;
+<<<<<<< Updated upstream
+=======
+    RectangleOverlay rectangleOverlay;
+    GestureDetector gestureDetector;
+>>>>>>> Stashed changes
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -109,6 +115,8 @@ public class MainActivity extends AppCompatActivity {
         });
         decirDescripcion.setOnClickListener(v -> textToSpeech.speak(textTo, TextToSpeech.QUEUE_FLUSH, null, null));
         ivPicture.setOnTouchListener((v, event) -> {
+            gestureDetector.onTouchEvent(event);
+
             String msg;
             if (imagen!=null && event.getAction() == MotionEvent.ACTION_DOWN) {
                 float x = event.getX();
@@ -132,12 +140,60 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         });
+
+        //TODO comprobar que donde clique esteContenido y hacer lo de los hilos
+        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public void onLongPress(MotionEvent e) {
+                int[] uve = new int[4];
+                uve[0] = 18;
+                uve[1] = 437;
+                uve[2] = 402;
+                uve[3] = 804;
+                int x = (int) e.getX();
+                int y = (int) e.getY();
+                Identificador identificador = tags.getIdentificador();
+                //if(identificador.estaContenido()){
+                firebase.callImagen(imagen.cortar(uve)).addOnCompleteListener(task -> {
+                    try {
+                        firebase.translatedImage(task.getResult().getTexto()).addOnCompleteListener(task2 -> {
+                            textTo = task2.getResult().getTexto();
+                            textToSpeech.speak(textTo, TextToSpeech.QUEUE_ADD, null, null);
+                        });
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+
+                });
+            }
+        //}
+
+        });
     }
+<<<<<<< Updated upstream
     public void dibujarBoundingBoxes(JSONObject o) throws JSONException {
         int[] ret = coord.convTam(o.getJSONObject("box").getInt("xmin"),
                     o.getJSONObject("box").getInt("ymin"),
                     o.getJSONObject("box").getInt("xmax"),
                     o.getJSONObject("box").getInt("ymax"));
+=======
+    public void dibujarBoundingBoxes(int ajuste, int iguala, JSONObject o,boolean giro) throws JSONException {
+        int[] ret = new int[4];
+        if(!giro){
+            ret[0] = o.getJSONObject("box").getInt("xmin")*ajuste;
+            ret[1] = o.getJSONObject("box").getInt("ymin")*ajuste + iguala;
+            ret[2] = o.getJSONObject("box").getInt("xmax")*ajuste;
+            ret[3] = o.getJSONObject("box").getInt("ymax")*ajuste + iguala;
+        }else{
+            ret[0] = o.getJSONObject("box").getInt("xmin")*ajuste + iguala;
+            ret[1] = o.getJSONObject("box").getInt("ymin")*ajuste;
+            ret[2] = o.getJSONObject("box").getInt("xmax")*ajuste + iguala;
+            ret[3] = o.getJSONObject("box").getInt("ymax")*ajuste;
+        }
+
+
+
+>>>>>>> Stashed changes
             rectangleOverlay.addCoordinates(ret);
     }
 
