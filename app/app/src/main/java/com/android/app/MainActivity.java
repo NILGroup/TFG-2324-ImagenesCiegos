@@ -55,11 +55,7 @@ public class MainActivity extends AppCompatActivity {
     //Objetos necesarios
     private Imagen imagen;
     private HiloTag tags;
-<<<<<<< Updated upstream
-=======
-    RectangleOverlay rectangleOverlay;
-    GestureDetector gestureDetector;
->>>>>>> Stashed changes
+    private GestureDetector gestureDetector;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -170,30 +166,11 @@ public class MainActivity extends AppCompatActivity {
 
         });
     }
-<<<<<<< Updated upstream
     public void dibujarBoundingBoxes(JSONObject o) throws JSONException {
         int[] ret = coord.convTam(o.getJSONObject("box").getInt("xmin"),
                     o.getJSONObject("box").getInt("ymin"),
                     o.getJSONObject("box").getInt("xmax"),
                     o.getJSONObject("box").getInt("ymax"));
-=======
-    public void dibujarBoundingBoxes(int ajuste, int iguala, JSONObject o,boolean giro) throws JSONException {
-        int[] ret = new int[4];
-        if(!giro){
-            ret[0] = o.getJSONObject("box").getInt("xmin")*ajuste;
-            ret[1] = o.getJSONObject("box").getInt("ymin")*ajuste + iguala;
-            ret[2] = o.getJSONObject("box").getInt("xmax")*ajuste;
-            ret[3] = o.getJSONObject("box").getInt("ymax")*ajuste + iguala;
-        }else{
-            ret[0] = o.getJSONObject("box").getInt("xmin")*ajuste + iguala;
-            ret[1] = o.getJSONObject("box").getInt("ymin")*ajuste;
-            ret[2] = o.getJSONObject("box").getInt("xmax")*ajuste + iguala;
-            ret[3] = o.getJSONObject("box").getInt("ymax")*ajuste;
-        }
-
-
-
->>>>>>> Stashed changes
             rectangleOverlay.addCoordinates(ret);
     }
 
