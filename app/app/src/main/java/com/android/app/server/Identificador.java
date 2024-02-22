@@ -29,6 +29,22 @@ public class Identificador {
         else
             return ret;
     }
+
+    public int[] getObjectBox(Coordenadas coord, int x, int y) throws JSONException {
+        int[] ret = new int[4];
+        for(int i = 0; i<json.length(); i++){
+            JSONObject box = json.getJSONObject(i).getJSONObject("box");
+            if(estaContenido(coord,box,x,y)){
+                ret[0] = box.getInt("xmin");
+                ret[1] = box.getInt("ymin");
+                ret[2] = box.getInt("xmax");
+                ret[3] = box.getInt("ymax");
+                return ret;
+            }
+        }
+        return null;
+    }
+
     public JSONArray getJsons(){
         return json;
     }
@@ -72,5 +88,4 @@ public class Identificador {
         return x> ret[0]  && x<ret[2] &&
                 y> ret[1] && y<ret[3];
     }
-
 }

@@ -112,7 +112,6 @@ public class MainActivity extends AppCompatActivity {
         decirDescripcion.setOnClickListener(v -> textToSpeech.speak(textTo, TextToSpeech.QUEUE_FLUSH, null, null));
         ivPicture.setOnTouchListener((v, event) -> {
             gestureDetector.onTouchEvent(event);
-
             String msg;
             if (imagen!=null && event.getAction() == MotionEvent.ACTION_DOWN) {
                 float x = event.getX();
@@ -142,26 +141,37 @@ public class MainActivity extends AppCompatActivity {
         gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public void onLongPress(MotionEvent e) {
-                int[] uve = new int[4];
-                uve[0] = 18;
-                uve[1] = 437;
-                uve[2] = 402;
-                uve[3] = 804;
-                int x = (int) e.getX();
-                int y = (int) e.getY();
-                Identificador identificador = tags.getIdentificador();
-                //if(identificador.estaContenido()){
-                firebase.callImagen(imagen.cortar(uve)).addOnCompleteListener(task -> {
-                    try {
-                        firebase.translatedImage(task.getResult().getTexto()).addOnCompleteListener(task2 -> {
-                            textTo = task2.getResult().getTexto();
-                            textToSpeech.speak(textTo, TextToSpeech.QUEUE_ADD, null, null);
-                        });
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
-                    }
+                String msg;
+                if (imagen!=null && e.getAction() == MotionEvent.ACTION_DOWN) {
 
-                });
+                    float x = e.getX();
+                    float y = e.getY();
+                    Identificador identificador = tags.getIdentificador();
+                    if(coord.zonaVacia(x,y)){
+                        textToSpeech.speak("Estás fuera de la imagen", TextToSpeech.QUEUE_ADD, null, null);
+                    }
+                    else{
+                        int[] box;
+                        try {
+                            box = identificador.getObjectBox(coord,(int) x, (int) y);
+                            if(box != null){
+                                firebase.callImagen(imagen.cortar(box)).addOnCompleteListener(task -> {
+                                    try {
+                                        firebase.translatedImage(task.getResult().getTexto()).addOnCompleteListener(task2 -> {
+                                            textTo = task2.getResult().getTexto();
+                                            textToSpeech.speak(textTo, TextToSpeech.QUEUE_ADD, null, null);
+                                        });
+                                    } catch (IOException ex) {
+                                        throw new RuntimeException(ex);
+                                    }
+
+                                });
+                            }
+                        } catch (JSONException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    }
+                }
             }
         //}
 
