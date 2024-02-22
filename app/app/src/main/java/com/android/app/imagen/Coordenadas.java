@@ -61,15 +61,17 @@ public class Coordenadas {
             ret[3] = (int) ( imageView.getWidth()-tamX*proporcion+ajusteVertical);
         }
         else{
-            ret[0] = (int) (x*proporcion+ajusteHorizontal);
-            ret[1] = (int) (y*proporcion+ajusteVertical);
-            ret[2] = (int) (tamX*proporcion+ajusteHorizontal);
-            ret[3] = (int) (tamY*proporcion+ajusteVertical);
+            ret[1] = (int) (x*proporcion+ajusteVertical);
+            ret[0] = (int) (y*proporcion+ajusteHorizontal);
+            ret[3] = (int) (tamX*proporcion+ajusteVertical);
+            ret[2] = (int) (tamY*proporcion+ajusteHorizontal);
         }*/
-        ret[1] = (int) (x*proporcion+ajusteVertical);
-        ret[0] = (int) (y*proporcion+ajusteHorizontal);
-        ret[3] = (int) (tamX*proporcion+ajusteVertical);
-        ret[2] = (int) (tamY*proporcion+ajusteHorizontal);
+
+
+        ret[0] = (int) (x*proporcion+ajusteHorizontal);
+        ret[1] = (int) (y*proporcion+ajusteVertical);
+        ret[2] = (int) (tamX*proporcion+ajusteHorizontal);
+        ret[3] = (int) (tamY*proporcion+ajusteVertical);
         return ret;
     }
 

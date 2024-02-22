@@ -123,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
                         msg = "Estás fuera de la imagen";
                     }
                     else{
+
                         for(int i=0;i<identificador.getJsons().length();i++){
                             dibujarBoundingBoxes(identificador.getJsons().getJSONObject(i));
                         }
