@@ -177,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
     private void tratamientoImagen(Intent data) throws IOException {
         imagen = new Imagen(MainActivity.this,data.getData());
         if(imagen.rotarImagen(data,ivPicture)){
-            textToSpeech.speak("La imagen está en horizontal", TextToSpeech.QUEUE_FLUSH, null, null);
+            textToSpeech.speak("La imagen está en horizontal, gire el dispositivo hacia la izquierda", TextToSpeech.QUEUE_FLUSH, null, null);
         }
         coord = new Coordenadas(ivPicture, imagen);
         tags = new HiloTag(imagen);
