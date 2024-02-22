@@ -127,8 +127,8 @@ public class MainActivity extends AppCompatActivity {
                         for(int i=0;i<identificador.getJsons().length();i++){
                             dibujarBoundingBoxes(identificador.getJsons().getJSONObject(i));
                         }
-                        int[] newCoords = coord.convCoord(x,y);
-                        msg = identificador.getObject(newCoords[0], newCoords[1]);
+                        //int[] newCoords = coord.convCoord(x,y);
+                        msg = identificador.getObject(coord,(int) x, (int) y);
                     }
                     textToSpeech.speak(msg, TextToSpeech.QUEUE_FLUSH, null, null);
                 } catch (JSONException e) {

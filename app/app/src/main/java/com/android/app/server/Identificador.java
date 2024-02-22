@@ -1,5 +1,7 @@
 package com.android.app.server;
 
+import com.android.app.imagen.Coordenadas;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,10 +17,10 @@ public class Identificador {
         json = new JSONArray(input);
     }
 
-    public String getObject(int x, int y) throws JSONException {
+    public String getObject(Coordenadas coord, int x, int y) throws JSONException {
         String ret = "";
         for(int i = 0; i<json.length(); i++){
-            if(estaContenido(json.getJSONObject(i).getJSONObject("box"),x,y)){
+            if(estaContenido(coord,json.getJSONObject(i).getJSONObject("box"),x,y)){
                 ret += json.getJSONObject(i).getString("label") + ",";
             }
         }
@@ -64,9 +66,11 @@ public class Identificador {
         }
     }
 
-    private boolean estaContenido(JSONObject box, int x, int y) throws JSONException {
-        return x> box.getInt("xmin") && x<box.getInt("xmax") &&
-                y> box.getInt("ymin") && y<box.getInt("ymax");
+    private boolean estaContenido(Coordenadas coord, JSONObject box, int x, int y) throws JSONException {
+        int[] ret = coord.convTam(box.getInt("xmin"),box.getInt("ymin"),box.getInt("xmax"),box.getInt("ymax"));
+
+        return x> ret[0]  && x<ret[2] &&
+                y> ret[1] && y<ret[3];
     }
 
 }

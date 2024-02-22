@@ -68,25 +68,29 @@ public class Coordenadas {
         }*/
 
 
-        ret[0] = (int) (x*proporcion+ajusteHorizontal);
+        ret[0] = (int) (x*proporcion+ajusteHorizontal-33);
         ret[1] = (int) (y*proporcion+ajusteVertical);
-        ret[2] = (int) (tamX*proporcion+ajusteHorizontal);
+        ret[2] = (int) (tamX*proporcion+ajusteHorizontal-33);
         ret[3] = (int) (tamY*proporcion+ajusteVertical);
         return ret;
     }
 
     public int[] convCoord(float x, float y){
         int[] ret = new int[2];
+        /*
         if(imagen.isGiro()){
             ret[0] = (int)  ((y / proporcion) - ajusteVertical);
             ret[1] = (int) ((x / proporcion) - ajusteHorizontal);
         }
         else {
-            ret[0] = (int) ((x / proporcion) - ajusteHorizontal);
-            ret[1] = (int) ((y / proporcion) - ajusteVertical);
-        }
+            ret[0] = (int) ((x / proporcion) - ajusteVertical);
+            ret[1] = (int) ((y / proporcion) - ajusteHorizontal);
+        }*/
+        ret[0] = (int) ((y / proporcion) - ajusteVertical);
+        ret[1] = (int) ((x / proporcion) - ajusteHorizontal);
         return ret;
     }
+
 
     public boolean zonaVacia(float x, float y){
         return x<ajusteHorizontal || y<ajusteVertical || x>imageView.getWidth()-ajusteHorizontal || y>imageView.getHeight()-ajusteVertical;
