@@ -1,7 +1,4 @@
-package com.android.app;
-
-import android.content.Context;
-import android.util.AttributeSet;
+package com.android.app.server;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,13 +13,12 @@ public class Identificador {
     protected JSONArray json;
     public Identificador(String input) throws JSONException {
         json = new JSONArray(input);
-
     }
 
-    public String getObject(int x, int y,int ajuste, int iguala) throws JSONException {
+    public String getObject(int x, int y) throws JSONException {
         String ret = "";
         for(int i = 0; i<json.length(); i++){
-            if(estaContenido(json.getJSONObject(i).getJSONObject("box"),x,y,ajuste, iguala)){
+            if(estaContenido(json.getJSONObject(i).getJSONObject("box"),x,y)){
                 ret += json.getJSONObject(i).getString("label") + ",";
             }
         }
@@ -31,22 +27,6 @@ public class Identificador {
         else
             return ret;
     }
-
-    /*
-    public int[] getCoords(int x, int y) throws JSONException {
-
-        int[] ret = new int[4];
-
-        for(int i = 0; i<json.length(); i++){
-            if(estaContenido(json.getJSONObject(i).getJSONObject("box"),x,y)){
-                ret[0] = json.getJSONObject(i).getJSONObject("box").getInt("xmin");
-                ret[1] = json.getJSONObject(i).getJSONObject("box").getInt("ymin");
-                ret[2] = json.getJSONObject(i).getJSONObject("box").getInt("xmax");
-                ret[3] = json.getJSONObject(i).getJSONObject("box").getInt("ymax");
-            }
-        }
-        return ret;
-    }*/
     public JSONArray getJsons(){
         return json;
     }
@@ -82,16 +62,11 @@ public class Identificador {
         for(int i = 0; i<json.length(); i++){
             json.getJSONObject(i).put("label", newNewLabels.get(i));
         }
-
     }
 
-    private boolean estaContenido(JSONObject box, int x, int y,int ajuste, int iguala) throws JSONException {
-       int xmin = box.getInt("xmin")*ajuste;
-       int ymin = box.getInt("ymin")*ajuste + iguala;
-       int xmax = box.getInt("xmax")*ajuste;
-       int ymax = box.getInt("ymax")*ajuste + iguala;
-
-        return x> xmin && x<xmax &&  y> ymin && y<ymax;
+    private boolean estaContenido(JSONObject box, int x, int y) throws JSONException {
+        return x> box.getInt("xmin") && x<box.getInt("xmax") &&
+                y> box.getInt("ymin") && y<box.getInt("ymax");
     }
 
 }

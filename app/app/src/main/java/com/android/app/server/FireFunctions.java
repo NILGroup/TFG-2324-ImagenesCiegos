@@ -1,4 +1,4 @@
-package com.android.app;
+package com.android.app.server;
 
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.functions.FirebaseFunctions;

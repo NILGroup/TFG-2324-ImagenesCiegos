@@ -1,4 +1,4 @@
-package com.android.app;
+package com.android.app.server;
 
 import org.json.JSONException;
 import org.json.JSONObject;

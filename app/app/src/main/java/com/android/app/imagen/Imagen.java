@@ -1,11 +1,13 @@
-package com.android.app;
+package com.android.app.imagen;
 
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapRegionDecoder;
+
+import android.graphics.BitmapFactory;
 import android.graphics.ImageDecoder;
-import android.graphics.Rect;
+
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.widget.ImageView;
 
@@ -22,8 +24,8 @@ import java.util.Objects;
 public class Imagen {
     protected Uri imageUri;
     private String base64;
-    private int height,width;
-
+    private float height,width;
+    private float ratio;
     private boolean giro;
     protected Context contexto;
 
@@ -31,12 +33,36 @@ public class Imagen {
 
         this.imageUri=imageUri;
         this.contexto=contexto;
-        codBase64(imageUri);
+        codBase642(imageUri);
     }
     public String getBase64() {return base64;}
-    public int getHeight() {return height;}
-    public int getWidth() { return width;}
+    public float getHeight() {return height;}
+    public float getWidth() { return width;}
+    public float getRatio() { return ratio;}
     public boolean isGiro() {return giro;}
+
+    private void codBase642(Uri uri) throws IOException {
+        // Obtener el bitmap desde la URI
+        Bitmap originalBitmap = BitmapFactory.decodeStream(contexto.getContentResolver().openInputStream(uri));
+        // Rotar la imagen si es necesario
+        if (ratio < 1) {
+            Matrix matrix = new Matrix();
+            matrix.postRotate(90);
+            originalBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.getWidth(), originalBitmap.getHeight(), matrix, true);
+        }
+
+        // Convertir el bitmap a un array de bytes
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        originalBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+
+        // Convertir el array de bytes a Base64
+        base64 = Base64.getEncoder().encodeToString(byteArray);
+
+        // Cerrar streams y liberar recursos
+        byteArrayOutputStream.close();
+        originalBitmap.recycle();
+    }
 
     private void codBase64(Uri uri) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -55,52 +81,20 @@ public class Imagen {
 
     public boolean rotarImagen(Intent data, ImageView ivPicture) throws IOException {
         giro = sacarRelacion(data);
-        if (giro)
+        /*if (giro)
             Glide.with(contexto.getApplicationContext()).load(data.getData()).apply(new RequestOptions().transform(new Rotate(90))) // Rotación de 90 grados
                     .into(ivPicture);
         else ivPicture.setImageURI(data.getData());
-        return giro;
+        return giro;*/
+        ivPicture.setImageURI(data.getData());
+        return false;
     }
     private boolean sacarRelacion(Intent data) throws IOException { //Ve si una imagen tiene que ir en vertical o en horizontal
         ImageDecoder.Source source = ImageDecoder.createSource(contexto.getContentResolver(), Objects.requireNonNull(data.getData()));
         Bitmap bitmap = ImageDecoder.decodeBitmap(source);
         height = bitmap.getHeight();
         width = bitmap.getWidth();
-        int ratio = height / width;
+        ratio = height / width;
         return ratio<1;
-    }
-
-    public String cortar(int coords[]) {
-        // Decodificar la cadena base64 en un array de bytes
-        byte[] imageBytes = Base64.getDecoder().decode(base64);
-
-        // Crear una región decodificadora para la imagen completa
-        BitmapRegionDecoder regionDecoder = null;
-        try {
-            regionDecoder = BitmapRegionDecoder.newInstance(imageBytes, 0, imageBytes.length, false);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // Crear un rectángulo que define la región a cortar
-        Rect cropRect = new Rect(coords[0], coords[1], coords[0] + coords[2], coords[1] + coords[3]);
-
-        // Decodificar la región específica
-        Bitmap croppedBitmap = regionDecoder.decodeRegion(cropRect, null);
-
-        // Convertir el bitmap recortado a una cadena Base64
-        String croppedBase64 = encodeBitmapToBase64(croppedBitmap);
-
-        // Liberar recursos
-        regionDecoder.recycle();
-        croppedBitmap.recycle();
-
-        return croppedBase64;
-    }
-    private String encodeBitmapToBase64(Bitmap bitmap) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-        byte[] byteArray = byteArrayOutputStream.toByteArray();
-        return Base64.getEncoder().encodeToString(byteArray);
     }
 }

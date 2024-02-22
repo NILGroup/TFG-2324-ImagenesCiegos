@@ -1,7 +1,7 @@
 package com.android.app.Hilo;
 
-import com.android.app.Identificador;
-import com.android.app.Imagen;
+import com.android.app.server.Identificador;
+import com.android.app.imagen.Imagen;
 
 import org.json.JSONException;
 

@@ -1,11 +1,9 @@
 package com.android.app.Hilo;
 
-import android.content.Context;
+import com.android.app.server.FireFunctions;
+import com.android.app.imagen.Imagen;
 
-import com.android.app.FireFunctions;
-import com.android.app.Imagen;
-
-public class Hilo extends Thread{
+public class Hilo{
     FireFunctions firebase;
     Imagen imagen;
 

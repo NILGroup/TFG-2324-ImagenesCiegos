@@ -8,14 +8,11 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.ImageButton;
@@ -24,8 +21,12 @@ import android.widget.ImageView;
 import android.speech.tts.TextToSpeech;
 
 import com.android.app.Hilo.HiloTag;
+import com.android.app.imagen.Coordenadas;
+import com.android.app.imagen.Imagen;
+import com.android.app.imagen.RectangleOverlay;
+import com.android.app.server.FireFunctions;
+import com.android.app.server.Identificador;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -47,12 +48,12 @@ public class MainActivity extends AppCompatActivity {
     private FireFunctions firebase;
     //Variables xml
     private ImageView ivPicture;
-    private BoundingBox bBox;
+    private RectangleOverlay rectangleOverlay;
+    private Coordenadas coord;
 
     //Objetos necesarios
     private Imagen imagen;
     private HiloTag tags;
-    RectangleOverlay rectangleOverlay;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -110,73 +111,33 @@ public class MainActivity extends AppCompatActivity {
         ivPicture.setOnTouchListener((v, event) -> {
             String msg;
             if (imagen!=null && event.getAction() == MotionEvent.ACTION_DOWN) {
-                int x = (int) event.getX();
-                int y = (int) event.getY();
+                float x = event.getX();
+                float y = event.getY();
                 try {
-                    tags.join();
                     Identificador identificador = tags.getIdentificador();
-                    ivPicture.setDrawingCacheEnabled(true);
-                    ivPicture.buildDrawingCache();
-                    Bitmap bitmap = ivPicture.getDrawingCache();
-                    if (y >= ivPicture.getHeight()) {
+                    if(coord.zonaVacia(x,y)){
                         msg = "Estás fuera de la imagen";
-                    } else {
-                        int pixel = bitmap.getPixel(x, y);
-                        if (Color.alpha(pixel) == 0) {
-                            msg ="Estás fuera de la imagen";
-                        } else {
-                            int ajuste = 1 ;
-                            int iguala;
-                            if(imagen.isGiro()){
-                                ajuste = ivPicture.getHeight()/imagen.getHeight();
-
-                                iguala = (ivPicture.getWidth()-imagen.getWidth()*ajuste)/2;
-                            }
-                            else{
-                                ajuste = ivPicture.getWidth()/imagen.getWidth();
-
-                                iguala = (ivPicture.getHeight()-imagen.getHeight()*ajuste)/2;
-                            }
-
-                            x /= ajuste;
-                            y /= ajuste;
-                            //Para pintar las bounding boxes
-                            for(int i=0;i<identificador.getJsons().length();i++){
-                                dibujarBoundingBoxes(ajuste,iguala,identificador.getJsons().getJSONObject(i),imagen.isGiro());
-                            }
-
-                            msg = identificador.getObject(x, y,ajuste,iguala);
-                            /*
-                            String imagencortada = imagen.cortar(identificador.getCoords(x,y));
-                            HiloDescrip objeto = new HiloDescrip(imagencortada);
-                            objeto.start();
-                            objeto.join();
-                            msg = objeto.getTexto();*/
+                    }
+                    else{
+                        for(int i=0;i<identificador.getJsons().length();i++){
+                            dibujarBoundingBoxes(identificador.getJsons().getJSONObject(i));
                         }
+                        int[] newCoords = coord.convCoord(x,y);
+                        msg = identificador.getObject(newCoords[0], newCoords[1]);
                     }
                     textToSpeech.speak(msg, TextToSpeech.QUEUE_FLUSH, null, null);
-                } catch (JSONException | InterruptedException e) {
+                } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
             }
             return true;
         });
     }
-    public void dibujarBoundingBoxes(int ajuste, int iguala, JSONObject o,boolean giro) throws JSONException {
-        int[] ret = new int[4];
-        if(!giro){
-            ret[0] = o.getJSONObject("box").getInt("xmin")*ajuste;
-            ret[1] = o.getJSONObject("box").getInt("ymin")*ajuste + iguala;
-            ret[2] = o.getJSONObject("box").getInt("xmax")*ajuste;
-            ret[3] = o.getJSONObject("box").getInt("ymax")*ajuste + iguala;
-        }else{
-            ret[0] = o.getJSONObject("box").getInt("xmin")*ajuste + iguala;
-            ret[1] = o.getJSONObject("box").getInt("ymin")*ajuste;
-            ret[2] = o.getJSONObject("box").getInt("xmax")*ajuste + iguala;
-            ret[3] = o.getJSONObject("box").getInt("ymax")*ajuste;
-        }
-
-
+    public void dibujarBoundingBoxes(JSONObject o) throws JSONException {
+        int[] ret = coord.convTam(o.getJSONObject("box").getInt("xmin"),
+                    o.getJSONObject("box").getInt("ymin"),
+                    o.getJSONObject("box").getInt("xmax"),
+                    o.getJSONObject("box").getInt("ymax"));
             rectangleOverlay.addCoordinates(ret);
     }
 
@@ -184,10 +145,10 @@ public class MainActivity extends AppCompatActivity {
         imagen = new Imagen(MainActivity.this,data.getData());
         if(imagen.rotarImagen(data,ivPicture)){
             textToSpeech.speak("La imagen está en horizontal", TextToSpeech.QUEUE_FLUSH, null, null);
-
         }
+        coord = new Coordenadas(ivPicture, imagen);
         tags = new HiloTag(imagen);
-        tags.start();
+        tags.run();
         firebase.callImagen(imagen.getBase64()).addOnCompleteListener(task -> {
             try {
                 firebase.translatedImage(task.getResult().getTexto()).addOnCompleteListener(task2 -> {

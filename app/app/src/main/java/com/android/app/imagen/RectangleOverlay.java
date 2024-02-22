@@ -1,4 +1,4 @@
-package com.android.app;
+package com.android.app.imagen;
 
 import android.content.Context;
 import android.graphics.Canvas;
