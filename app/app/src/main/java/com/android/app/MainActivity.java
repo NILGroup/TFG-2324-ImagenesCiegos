@@ -32,6 +32,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
     //TextToSpeech
     private String textTo;
+    private HashMap<String,String> descripDetallada;
     private TextToSpeech textToSpeech;
     //Firebase
     private FireFunctions firebase;
@@ -126,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
                         for(int i=0;i<identificador.getJsons().length();i++){
                             dibujarBoundingBoxes(identificador.getJsons().getJSONObject(i));
                         }
-                        //int[] newCoords = coord.convCoord(x,y);
                         msg = identificador.getObject(coord,(int) x, (int) y);
                     }
                     textToSpeech.speak(msg, TextToSpeech.QUEUE_FLUSH, null, null);
@@ -153,19 +154,26 @@ public class MainActivity extends AppCompatActivity {
                     else{
                         int[] box;
                         try {
-                            box = identificador.getObjectBox(coord,(int) x, (int) y);
-                            if(box != null){
-                                firebase.callImagen(imagen.cortar(box)).addOnCompleteListener(task -> {
-                                    try {
-                                        firebase.translatedImage(task.getResult().getTexto()).addOnCompleteListener(task2 -> {
-                                            textTo = task2.getResult().getTexto();
-                                            textToSpeech.speak(textTo, TextToSpeech.QUEUE_ADD, null, null);
-                                        });
-                                    } catch (IOException ex) {
-                                        throw new RuntimeException(ex);
-                                    }
+                            String objeto = identificador.getObject(coord,(int) x, (int) y);
+                            if(objeto != "" && descripDetallada.containsKey(objeto)){
+                                textToSpeech.speak(descripDetallada.get(objeto), TextToSpeech.QUEUE_ADD, null, null);
+                            }
+                            else {
+                                box = identificador.getObjectBox(coord, (int) x, (int) y);
+                                if (box != null) {
+                                    firebase.callImagen(imagen.cortar(box)).addOnCompleteListener(task -> {
+                                        try {
+                                            firebase.translatedImage(task.getResult().getTexto()).addOnCompleteListener(task2 -> {
+                                                textTo = task2.getResult().getTexto();
+                                                descripDetallada.put(objeto,textTo);
+                                                textToSpeech.speak(textTo, TextToSpeech.QUEUE_ADD, null, null);
+                                            });
+                                        } catch (IOException ex) {
+                                            throw new RuntimeException(ex);
+                                        }
 
-                                });
+                                    });
+                                }
                             }
                         } catch (JSONException ex) {
                             throw new RuntimeException(ex);
@@ -187,6 +195,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void tratamientoImagen(Intent data) throws IOException {
         imagen = new Imagen(MainActivity.this,data.getData());
+        descripDetallada = new HashMap<>();
         if(imagen.rotarImagen(data,ivPicture)){
             textToSpeech.speak("La imagen está en horizontal, gire el dispositivo hacia la izquierda", TextToSpeech.QUEUE_FLUSH, null, null);
         }

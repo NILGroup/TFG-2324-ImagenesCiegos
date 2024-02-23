@@ -1,6 +1,7 @@
 package com.android.app.server;
 
 import com.android.app.imagen.Coordenadas;
+import com.google.android.gms.common.api.Api;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -8,11 +9,13 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class Identificador {
 
     protected JSONArray json;
+    private HashMap<String,String> descripDetallada;
     public Identificador(String input) throws JSONException {
         json = new JSONArray(input);
     }
