@@ -202,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
         coord = new Coordenadas(ivPicture, imagen);
         tags = new HiloTag(imagen);
         tags.run();
+        textToSpeech.speak("Obteniendo descripción, espere unos segundos.", TextToSpeech.QUEUE_ADD, null, null);
         firebase.callImagen(imagen.getBase64()).addOnCompleteListener(task -> {
             try {
                 firebase.translatedImage(task.getResult().getTexto()).addOnCompleteListener(task2 -> {
