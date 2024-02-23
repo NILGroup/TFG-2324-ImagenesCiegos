@@ -158,7 +158,8 @@ public class MainActivity extends AppCompatActivity {
                                 textToSpeech.speak(descripDetallada.get(objeto), TextToSpeech.QUEUE_ADD, null, null);
                             }
                             else {
-                                box = identificador.getObjectBox(coord, (int) x, (int) y);
+
+                                box = identificador.getObjectBoxSoloUno(coord, (int) x, (int) y);
                                 if (box != null) {
                                     firebase.callImagen(imagen.cortar(box)).addOnCompleteListener(task -> {
                                         try {

@@ -24,6 +24,7 @@ public class Identificador {
         String ret = "";
         for(int i = 0; i<json.length(); i++){
             if(estaContenido(coord,json.getJSONObject(i).getJSONObject("box"),x,y)){
+
                 ret += json.getJSONObject(i).getString("label") + ",";
             }
         }
@@ -61,9 +62,28 @@ public class Identificador {
             }
             ret = ret.substring(0,ret.length()-1);
         }
-        
+
         return ret;
     }
+    public int[] getObjectBoxSoloUno(Coordenadas coord, int x, int y) throws JSONException {
+        int[] ret = new int[4];
+        int min = Integer.MAX_VALUE;
+        for(int i = 0; i<json.length(); i++){
+            JSONObject box = json.getJSONObject(i).getJSONObject("box");
+            if(estaContenido(coord,box,x,y)){
+                int d = distanciaManhattan(coord,json.getJSONObject(i).getJSONObject("box"),x,y);
+                if(d<min){
+                    ret[0] = box.getInt("xmin");
+                    ret[1] = box.getInt("ymin");
+                    ret[2] = box.getInt("xmax");
+                    ret[3] = box.getInt("ymax");
+                    min = d;
+                }
+            }
+        }
+       return ret;
+    }
+
 
     public void changeLabels(String input) throws JSONException {
 
@@ -87,6 +107,15 @@ public class Identificador {
         for(int i = 0; i<json.length(); i++){
             json.getJSONObject(i).put("label", newNewLabels.get(i));
         }
+    }
+    private int distanciaManhattan(Coordenadas coord, JSONObject box, int x, int y) throws JSONException {
+        int[] ret = coord.convTam(box.getInt("xmin"),box.getInt("ymin"),box.getInt("xmax"),box.getInt("ymax"));
+        int dist =0;
+        int[] centro = new int[2];
+        centro[0] = (ret[0]+ret[2])/2;
+        centro[1] = (ret[1]+ret[3])/2;
+        dist = Math.abs(x - centro[0]) + Math.abs(y - centro[1]);
+        return dist;
     }
 
     private boolean estaContenido(Coordenadas coord, JSONObject box, int x, int y) throws JSONException {
