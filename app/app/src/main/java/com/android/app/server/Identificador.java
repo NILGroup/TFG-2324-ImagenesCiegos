@@ -54,10 +54,14 @@ public class Identificador {
 
     public String getLabels() throws JSONException {
         String ret = "";
-        for(int i = 0; i<json.length(); i++){
-            ret += '"' + json.getJSONObject(i).getString("label") + '"' + ',';
+        //Si no se ha detectado ningún objeto saltamos
+        if(json.length()>0){
+            for(int i = 0; i<json.length(); i++){
+                ret += '"' + json.getJSONObject(i).getString("label") + '"' + ',';
+            }
+            ret = ret.substring(0,ret.length()-1);
         }
-        ret = ret.substring(0,ret.length()-1);
+        
         return ret;
     }
 

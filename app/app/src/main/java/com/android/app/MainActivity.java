@@ -138,7 +138,6 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-        //TODO comprobar que donde clique esteContenido y hacer lo de los hilos
         gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public void onLongPress(MotionEvent e) {

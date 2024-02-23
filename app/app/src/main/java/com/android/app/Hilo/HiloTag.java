@@ -21,14 +21,17 @@ public class HiloTag extends Hilo{
     public void run(){
         firebase.callTags(imagen.getBase64()).addOnCompleteListener(task -> {
                 identificador = task.getResult();
+
                     try {
-                        firebase.translatedImage(identificador.getLabels()).addOnCompleteListener(task2 -> {
-                            try {
-                                identificador.changeLabels(task2.getResult().getTexto());
-                            } catch (JSONException e) {
-                                throw new RuntimeException(e);
-                            }
-                        });
+                        if(identificador.getLabels()!=""){
+                            firebase.translatedImage(identificador.getLabels()).addOnCompleteListener(task2 -> {
+                                try {
+                                    identificador.changeLabels(task2.getResult().getTexto());
+                                } catch (JSONException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            });
+                        }
                     } catch (IOException | JSONException e) {
                         throw new RuntimeException(e);
                     }
