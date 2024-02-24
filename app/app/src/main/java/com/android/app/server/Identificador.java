@@ -70,6 +70,7 @@ public class Identificador extends Query{
         //Para añadir sufijo cuaando dos objetos tengan el mismo nombre
         for(int j=0;j<json.length();j++){
                 String nuevaEtiqueta = newLabels.get(j);
+                nuevaEtiqueta=  nuevaEtiqueta.trim();
                 if (newNewLabels.contains(nuevaEtiqueta)) {
                     int sufijo = 1;
                     while (newNewLabels.contains(nuevaEtiqueta + sufijo)) {
