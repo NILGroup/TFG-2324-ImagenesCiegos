@@ -35,6 +35,12 @@ public class RectangleOverlay extends View {
         invalidate(); // Vuelve a dibujar la vista
     }
 
+    public void clearRectangles() {
+        coordinatesList.clear();
+        invalidate(); // Vuelve a dibujar la vista para que los rectángulos desaparezcan
+    }
+
+
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);

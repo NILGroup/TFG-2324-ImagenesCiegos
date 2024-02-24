@@ -1,23 +1,27 @@
 package com.android.app.Hilo;
 
+import com.android.app.server.Descripcion;
+import com.android.app.server.FireFunctions;
+import com.android.app.server.Traduccion;
+
 import java.io.IOException;
 
 public class HiloDescrip extends Hilo{
+    private Traduccion traduccion;
 
-    private String texto;
-    private final String subImageBase64;
-
-    public HiloDescrip(String subImageBase64) {
-        super();
-        this.subImageBase64 = subImageBase64;
+    public HiloDescrip(String imagen, FireFunctions firebase) {
+        super(imagen,firebase);
     }
 
-    public String getTexto() {return texto;}
+    public Traduccion getTraduccion() {return traduccion;}
 
     public void run(){
-        firebase.callImagen(subImageBase64).addOnCompleteListener(task -> {
+        firebase.callImagen(imagen).addOnCompleteListener(task -> {
+            Descripcion descripcion = task.getResult();
             try {
-                firebase.translatedImage(task.getResult().getTexto()).addOnCompleteListener(task2 -> texto = task2.getResult().getTexto());
+                firebase.translatedImage(descripcion.getTexto()).addOnCompleteListener(task2 -> {
+                    traduccion =task2.getResult();
+                });
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class FireFunctions {
 
-    protected FirebaseFunctions fFunc = FirebaseFunctions.getInstance();
+    private FirebaseFunctions fFunc = FirebaseFunctions.getInstance();
 
     public Task<Descripcion> callImagen(String name ){
 

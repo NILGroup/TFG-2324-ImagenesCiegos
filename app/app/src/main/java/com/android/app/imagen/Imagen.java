@@ -58,9 +58,11 @@ public class Imagen {
 
     public boolean rotarImagen(Intent data, ImageView ivPicture) throws IOException {
         giro = sacarRelacion(data);
-        if (giro)
+        if (giro){
             Glide.with(contexto.getApplicationContext()).load(data.getData()).apply(new RequestOptions().transform(new Rotate(90))) // Rotación de 90 grados
                     .into(ivPicture);
+            ratio = 1/ratio;
+        }
         else ivPicture.setImageURI(data.getData());
         return giro;
         //ivPicture.setImageURI(data.getData());

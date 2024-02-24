@@ -2,7 +2,6 @@ package com.android.app.server;
 
 import com.android.app.imagen.Coordenadas;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -10,12 +9,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Identificador {
-
-    protected JSONArray json;
+public class Identificador extends Query{
 
     public Identificador(String input) throws JSONException {
-        json = new JSONArray(input);
+        super(input);
+        texto = getLabels();
+    }
+    private String getLabels() throws JSONException {
+        String ret = "";
+        //Si no se ha detectado ningún objeto saltamos
+        if(json.length()>0){
+            for(int i = 0; i<json.length(); i++){
+                ret += '"' + json.getJSONObject(i).getString("label") + '"' + ',';
+            }
+            ret = ret.substring(0,ret.length()-1);
+        }
+        return ret;
     }
 
     public String getObject(Coordenadas coord, int x, int y,boolean giro) throws JSONException {
@@ -33,37 +42,6 @@ public class Identificador {
     }
 
     public int[] getObjectBox(Coordenadas coord, int x, int y,boolean giro) throws JSONException {
-        int[] ret = new int[4];
-        for(int i = 0; i<json.length(); i++){
-            JSONObject box = json.getJSONObject(i).getJSONObject("box");
-            if(estaContenido(coord,box,x,y,giro)){
-                ret[0] = box.getInt("xmin");
-                ret[1] = box.getInt("ymin");
-                ret[2] = box.getInt("xmax");
-                ret[3] = box.getInt("ymax");
-                return ret;
-            }
-        }
-        return null;
-    }
-
-    public JSONArray getJsons(){
-        return json;
-    }
-
-    public String getLabels() throws JSONException {
-        String ret = "";
-        //Si no se ha detectado ningún objeto saltamos
-        if(json.length()>0){
-            for(int i = 0; i<json.length(); i++){
-                ret += '"' + json.getJSONObject(i).getString("label") + '"' + ',';
-            }
-            ret = ret.substring(0,ret.length()-1);
-        }
-
-        return ret;
-    }
-    public int[] getObjectBoxSoloUno(Coordenadas coord, int x, int y,boolean giro) throws JSONException {
         int[] ret = new int[4];
         int min = Integer.MAX_VALUE;
         for(int i = 0; i<json.length(); i++){
@@ -83,7 +61,7 @@ public class Identificador {
     }
 
 
-    public void changeLabels(String input) throws JSONException {
+    public void setTexto(String input) throws JSONException {
 
         String[] lista = input.replaceAll("\"","").split(",");
         List<String> newLabels = Arrays.asList(lista);

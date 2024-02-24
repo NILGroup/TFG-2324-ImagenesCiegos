@@ -1,15 +1,19 @@
 package com.android.app.server;
 
+import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
-public class Query{
+public abstract class Query{
 
-    protected JSONObject json;
+    protected JSONArray json;
+    protected String texto;
 
     public Query(String input) throws JSONException {
-        input = input.substring(1,input.length()-1);
-        json = new JSONObject(input);
+        json = new JSONArray(input);
     }
 
+    public String getTexto() {
+        return texto;
+    }
+    public JSONArray getJson() {return json; }
 }

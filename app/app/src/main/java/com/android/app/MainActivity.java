@@ -22,6 +22,7 @@ import android.widget.ImageView;
 
 import android.speech.tts.TextToSpeech;
 
+import com.android.app.Hilo.HiloDescrip;
 import com.android.app.Hilo.HiloTag;
 import com.android.app.imagen.Coordenadas;
 import com.android.app.imagen.Imagen;
@@ -120,19 +121,19 @@ public class MainActivity extends AppCompatActivity {
                 float x = event.getX();
                 float y = event.getY();
                 try {
+                    tags.join();
                     Identificador identificador = tags.getIdentificador();
                     if(coord.zonaVacia(x,y)){
                         msg = "Estás fuera de la imagen";
                     }
                     else{
-
-                        for(int i=0;i<identificador.getJsons().length();i++){
-                            dibujarBoundingBoxes(identificador.getJsons().getJSONObject(i));
+                        for(int i=0;i<identificador.getJson().length();i++){
+                            dibujarBoundingBoxes(identificador.getJson().getJSONObject(i));
                         }
                         msg = identificador.getObject(coord,(int) x, (int) y,imagen.isGiro());
                     }
                     textToSpeech.speak(msg, TextToSpeech.QUEUE_FLUSH, null, null);
-                } catch (JSONException e) {
+                } catch (JSONException | InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -147,6 +148,11 @@ public class MainActivity extends AppCompatActivity {
 
                     float x = e.getX();
                     float y = e.getY();
+                    try {
+                        tags.join();
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
                     Identificador identificador = tags.getIdentificador();
                     if(coord.zonaVacia(x,y)){
                         textToSpeech.speak("Estás fuera de la imagen", TextToSpeech.QUEUE_ADD, null, null);
@@ -160,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                             else {
 
-                                box = identificador.getObjectBoxSoloUno(coord, (int) x, (int) y,imagen.isGiro());
+                                box = identificador.getObjectBox(coord, (int) x, (int) y,imagen.isGiro());
                                 if (box != null) {
                                     firebase.callImagen(imagen.cortar(box)).addOnCompleteListener(task -> {
                                         try {
@@ -197,13 +203,14 @@ public class MainActivity extends AppCompatActivity {
     private void tratamientoImagen(Intent data) throws IOException {
         imagen = new Imagen(MainActivity.this,data.getData());
         descripDetallada = new HashMap<>();
+        rectangleOverlay.clearRectangles();
         if(imagen.rotarImagen(data,ivPicture)){
             textToSpeech.speak("La imagen está en horizontal, gire el dispositivo hacia la izquierda", TextToSpeech.QUEUE_FLUSH, null, null);
         }
         coord = new Coordenadas(ivPicture, imagen);
-        tags = new HiloTag(imagen);
-        tags.run();
-        textToSpeech.speak("Obteniendo descripción, espere unos segundos.", TextToSpeech.QUEUE_ADD, null, null);
+        tags = new HiloTag(imagen.getBase64(),firebase);
+        tags.start();
+        textToSpeech.speak("Obteniendo descripción", TextToSpeech.QUEUE_ADD, null, null);
         firebase.callImagen(imagen.getBase64()).addOnCompleteListener(task -> {
             try {
                 firebase.translatedImage(task.getResult().getTexto()).addOnCompleteListener(task2 -> {
