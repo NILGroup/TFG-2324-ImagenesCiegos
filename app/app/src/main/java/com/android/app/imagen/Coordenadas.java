@@ -42,16 +42,16 @@ public class Coordenadas {
     public int[] convTam(int x,int y, int tamX, int tamY){
         int[] ret = new int[4];
         if(imagen.isGiro()){
-            ret[0] = (int) (imageView.getWidth()-(y*proporcion)+ajusteHorizontal-33);
+            ret[0] = (int) (imageView.getWidth()-(y*proporcion)-ajusteHorizontal-33);
             ret[1] = (int) (x*proporcion+ajusteVertical);
-            ret[2] = (int) (imageView.getWidth()-(tamY*proporcion)+ajusteHorizontal-33);
+            ret[2] = (int) (imageView.getWidth()-(tamY*proporcion)-ajusteHorizontal-33);
             ret[3] = (int) (tamX*proporcion+ajusteVertical);
         }
         else{
-        ret[0] = (int) (x*proporcion+ajusteHorizontal-33);
-        ret[1] = (int) (y*proporcion+ajusteVertical);
-        ret[2] = (int) (tamX*proporcion+ajusteHorizontal-33);
-        ret[3] = (int) (tamY*proporcion+ajusteVertical);
+            ret[0] = (int) (x*proporcion+ajusteHorizontal-33);
+            ret[1] = (int) (y*proporcion+ajusteVertical);
+            ret[2] = (int) (tamX*proporcion+ajusteHorizontal-33);
+            ret[3] = (int) (tamY*proporcion+ajusteVertical);
         }
         return ret;
     }
