@@ -23,7 +23,7 @@ public class HiloTag extends Hilo{
                 identificador = task.getResult();
 
                     try {
-                        if(identificador.getLabels()!=""){
+                        if(!identificador.getLabels().equals("")){
                             firebase.translatedImage(identificador.getLabels()).addOnCompleteListener(task2 -> {
                                 try {
                                     identificador.changeLabels(task2.getResult().getTexto());

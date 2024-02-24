@@ -2,6 +2,7 @@ package com.android.app;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -128,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                         for(int i=0;i<identificador.getJsons().length();i++){
                             dibujarBoundingBoxes(identificador.getJsons().getJSONObject(i));
                         }
-                        msg = identificador.getObject(coord,(int) x, (int) y);
+                        msg = identificador.getObject(coord,(int) x, (int) y,imagen.isGiro());
                     }
                     textToSpeech.speak(msg, TextToSpeech.QUEUE_FLUSH, null, null);
                 } catch (JSONException e) {
@@ -140,8 +141,8 @@ public class MainActivity extends AppCompatActivity {
 
         gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
-            public void onLongPress(MotionEvent e) {
-                String msg;
+            public void onLongPress(@NonNull MotionEvent e) {
+
                 if (imagen!=null && e.getAction() == MotionEvent.ACTION_DOWN) {
 
                     float x = e.getX();
@@ -153,13 +154,13 @@ public class MainActivity extends AppCompatActivity {
                     else{
                         int[] box;
                         try {
-                            String objeto = identificador.getObject(coord,(int) x, (int) y);
-                            if(objeto != "" && descripDetallada.containsKey(objeto)){
+                            String objeto = identificador.getObject(coord,(int) x, (int) y,imagen.isGiro());
+                            if(!objeto.equals("") && descripDetallada.containsKey(objeto)){
                                 textToSpeech.speak(descripDetallada.get(objeto), TextToSpeech.QUEUE_ADD, null, null);
                             }
                             else {
 
-                                box = identificador.getObjectBoxSoloUno(coord, (int) x, (int) y);
+                                box = identificador.getObjectBoxSoloUno(coord, (int) x, (int) y,imagen.isGiro());
                                 if (box != null) {
                                     firebase.callImagen(imagen.cortar(box)).addOnCompleteListener(task -> {
                                         try {

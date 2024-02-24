@@ -11,6 +11,10 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.Rotate;
+import com.bumptech.glide.request.RequestOptions;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,13 +58,13 @@ public class Imagen {
 
     public boolean rotarImagen(Intent data, ImageView ivPicture) throws IOException {
         giro = sacarRelacion(data);
-        /*if (giro)
+        if (giro)
             Glide.with(contexto.getApplicationContext()).load(data.getData()).apply(new RequestOptions().transform(new Rotate(90))) // Rotación de 90 grados
                     .into(ivPicture);
         else ivPicture.setImageURI(data.getData());
-        return giro;*/
-        ivPicture.setImageURI(data.getData());
-        return false;
+        return giro;
+        //ivPicture.setImageURI(data.getData());
+        //return false;
     }
     private boolean sacarRelacion(Intent data) throws IOException { //Ve si una imagen tiene que ir en vertical o en horizontal
         ImageDecoder.Source source = ImageDecoder.createSource(contexto.getContentResolver(), Objects.requireNonNull(data.getData()));

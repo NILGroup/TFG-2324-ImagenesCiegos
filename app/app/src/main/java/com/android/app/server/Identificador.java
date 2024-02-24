@@ -1,7 +1,6 @@
 package com.android.app.server;
 
 import com.android.app.imagen.Coordenadas;
-import com.google.android.gms.common.api.Api;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -9,36 +8,35 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 public class Identificador {
 
     protected JSONArray json;
-    private HashMap<String,String> descripDetallada;
+
     public Identificador(String input) throws JSONException {
         json = new JSONArray(input);
     }
 
-    public String getObject(Coordenadas coord, int x, int y) throws JSONException {
+    public String getObject(Coordenadas coord, int x, int y,boolean giro) throws JSONException {
         String ret = "";
         for(int i = 0; i<json.length(); i++){
-            if(estaContenido(coord,json.getJSONObject(i).getJSONObject("box"),x,y)){
+            if(estaContenido(coord,json.getJSONObject(i).getJSONObject("box"),x,y,giro)){
 
                 ret += json.getJSONObject(i).getString("label") + ",";
             }
         }
-        if(ret =="")
+        if(ret.equals(""))
             return "No hay ningún objeto";
         else
             return ret;
     }
 
-    public int[] getObjectBox(Coordenadas coord, int x, int y) throws JSONException {
+    public int[] getObjectBox(Coordenadas coord, int x, int y,boolean giro) throws JSONException {
         int[] ret = new int[4];
         for(int i = 0; i<json.length(); i++){
             JSONObject box = json.getJSONObject(i).getJSONObject("box");
-            if(estaContenido(coord,box,x,y)){
+            if(estaContenido(coord,box,x,y,giro)){
                 ret[0] = box.getInt("xmin");
                 ret[1] = box.getInt("ymin");
                 ret[2] = box.getInt("xmax");
@@ -65,12 +63,12 @@ public class Identificador {
 
         return ret;
     }
-    public int[] getObjectBoxSoloUno(Coordenadas coord, int x, int y) throws JSONException {
+    public int[] getObjectBoxSoloUno(Coordenadas coord, int x, int y,boolean giro) throws JSONException {
         int[] ret = new int[4];
         int min = Integer.MAX_VALUE;
         for(int i = 0; i<json.length(); i++){
             JSONObject box = json.getJSONObject(i).getJSONObject("box");
-            if(estaContenido(coord,box,x,y)){
+            if(estaContenido(coord,box,x,y,giro)){
                 int d = distanciaManhattan(coord,json.getJSONObject(i).getJSONObject("box"),x,y);
                 if(d<min){
                     ret[0] = box.getInt("xmin");
@@ -110,7 +108,7 @@ public class Identificador {
     }
     private int distanciaManhattan(Coordenadas coord, JSONObject box, int x, int y) throws JSONException {
         int[] ret = coord.convTam(box.getInt("xmin"),box.getInt("ymin"),box.getInt("xmax"),box.getInt("ymax"));
-        int dist =0;
+        int dist;
         int[] centro = new int[2];
         centro[0] = (ret[0]+ret[2])/2;
         centro[1] = (ret[1]+ret[3])/2;
@@ -118,9 +116,12 @@ public class Identificador {
         return dist;
     }
 
-    private boolean estaContenido(Coordenadas coord, JSONObject box, int x, int y) throws JSONException {
+    private boolean estaContenido(Coordenadas coord, JSONObject box, int x, int y,boolean giro) throws JSONException {
         int[] ret = coord.convTam(box.getInt("xmin"),box.getInt("ymin"),box.getInt("xmax"),box.getInt("ymax"));
-
+        if(giro){
+            return x> ret[2]  && x<ret[0] &&
+                    y> ret[1] && y<ret[3];
+        }
         return x> ret[0]  && x<ret[2] &&
                 y> ret[1] && y<ret[3];
     }
