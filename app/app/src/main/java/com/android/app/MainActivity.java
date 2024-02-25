@@ -115,32 +115,12 @@ public class MainActivity extends AppCompatActivity {
         });
         decirDescripcion.setOnClickListener(v -> textToSpeech.speak(textTo, TextToSpeech.QUEUE_FLUSH, null, null));
         ivPicture.setOnTouchListener((v, event) -> {
+
             gestureDetector.onTouchEvent(event);
-            String msg;
-            if (imagen!=null && event.getAction() == MotionEvent.ACTION_DOWN) {
-                float x = event.getX();
-                float y = event.getY();
-                try {
-                    tags.join();
-                    Identificador identificador = tags.getIdentificador();
-                    if(coord.zonaVacia(x,y)){
-                        msg = "Estás fuera de la imagen";
-                    }
-                    else{
-                        for(int i=0;i<identificador.getJson().length();i++){
-                            dibujarBoundingBoxes(identificador.getJson().getJSONObject(i));
-                        }
-                        msg = identificador.getObject(coord,(int) x, (int) y,imagen.isGiro());
-                    }
-                    textToSpeech.speak(msg, TextToSpeech.QUEUE_FLUSH, null, null);
-                } catch (JSONException | InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
             return true;
         });
 
-        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+        gestureDetector = new GestureDetector(ivPicture.getContext(), new GestureDetector.SimpleOnGestureListener() {
             @Override
             public void onLongPress(@NonNull MotionEvent e) {
 
@@ -188,8 +168,30 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-        //}
-
+            public boolean onSingleTapConfirmed(MotionEvent event){
+                String msg;
+                if (imagen!=null && event.getAction() == MotionEvent.ACTION_DOWN) {
+                    float x = event.getX();
+                    float y = event.getY();
+                    try {
+                        tags.join();
+                        Identificador identificador = tags.getIdentificador();
+                        if(coord.zonaVacia(x,y)){
+                            msg = "Estás fuera de la imagen";
+                        }
+                        else{
+                            for(int i=0;i<identificador.getJson().length();i++){
+                                dibujarBoundingBoxes(identificador.getJson().getJSONObject(i));
+                            }
+                            msg = identificador.getObject(coord,(int) x, (int) y,imagen.isGiro());
+                        }
+                        textToSpeech.speak(msg, TextToSpeech.QUEUE_FLUSH, null, null);
+                    } catch (JSONException | InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                return false;
+            }
         });
     }
     public void dibujarBoundingBoxes(JSONObject o) throws JSONException {
