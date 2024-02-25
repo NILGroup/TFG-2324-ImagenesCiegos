@@ -65,8 +65,6 @@ public class Imagen {
         }
         else ivPicture.setImageURI(data.getData());
         return giro;
-        //ivPicture.setImageURI(data.getData());
-        //return false;
     }
     private boolean sacarRelacion(Intent data) throws IOException { //Ve si una imagen tiene que ir en vertical o en horizontal
         ImageDecoder.Source source = ImageDecoder.createSource(contexto.getContentResolver(), Objects.requireNonNull(data.getData()));
@@ -93,6 +91,7 @@ public class Imagen {
         Rect cropRect = new Rect(coords[0], coords[1], coords[0] + coords[2], coords[1] + coords[3]);
 
         // Decodificar la región específica
+        assert regionDecoder != null;
         Bitmap croppedBitmap = regionDecoder.decodeRegion(cropRect, null);
 
         // Convertir el bitmap recortado a una cadena Base64

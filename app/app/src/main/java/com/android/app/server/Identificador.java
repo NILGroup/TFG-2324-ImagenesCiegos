@@ -16,29 +16,29 @@ public class Identificador extends Query{
         texto = getLabels();
     }
     private String getLabels() throws JSONException {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         //Si no se ha detectado ningún objeto saltamos
         if(json.length()>0){
             for(int i = 0; i<json.length(); i++){
-                ret += '"' + json.getJSONObject(i).getString("label") + '"' + ',';
+                ret.append('"').append(json.getJSONObject(i).getString("label")).append('"').append(',');
             }
-            ret = ret.substring(0,ret.length()-1);
+            ret = new StringBuilder(ret.substring(0, ret.length() - 1));
         }
-        return ret;
+        return ret.toString();
     }
 
     public String getObject(Coordenadas coord, int x, int y,boolean giro) throws JSONException {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         for(int i = 0; i<json.length(); i++){
             if(estaContenido(coord,json.getJSONObject(i).getJSONObject("box"),x,y,giro)){
 
-                ret += json.getJSONObject(i).getString("label") + ",";
+                ret.append(json.getJSONObject(i).getString("label")).append(",");
             }
         }
-        if(ret.equals(""))
+        if(ret.toString().equals(""))
             return "No hay ningún objeto";
         else
-            return ret;
+            return ret.toString();
     }
 
     public int[] getObjectBox(Coordenadas coord, int x, int y,boolean giro) throws JSONException {

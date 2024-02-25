@@ -19,9 +19,7 @@ public class HiloDescrip extends Hilo{
         firebase.callImagen(imagen).addOnCompleteListener(task -> {
             Descripcion descripcion = task.getResult();
             try {
-                firebase.translatedImage(descripcion.getTexto()).addOnCompleteListener(task2 -> {
-                    traduccion =task2.getResult();
-                });
+                firebase.translatedImage(descripcion.getTexto()).addOnCompleteListener(task2 -> traduccion =task2.getResult());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
