@@ -16,7 +16,9 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
@@ -27,6 +29,7 @@ import com.android.app.Hilo.HiloTag;
 import com.android.app.imagen.Coordenadas;
 import com.android.app.imagen.Imagen;
 import com.android.app.imagen.RectangleOverlay;
+import com.android.app.imagen.Talkback;
 import com.android.app.server.FireFunctions;
 import com.android.app.server.Identificador;
 
@@ -61,6 +64,10 @@ public class MainActivity extends AppCompatActivity {
     private HiloTag tags;
     private GestureDetector gestureDetector;
 
+    private Talkback talkback;
+
+    private boolean talkback_activado=true;
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,27 +81,42 @@ public class MainActivity extends AppCompatActivity {
 
         firebase = new FireFunctions();
         textToSpeech = new TextToSpeech(this, status -> {});
+        talkback = new Talkback(this);
+
+        // Listener para las teclas de volumen
+        View rootView = findViewById(android.R.id.content);
+        rootView.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // Verifica si la tecla presionada es de volumen y si talkback_activado está a true
+                if ((keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) && !talkback_activado) {
+                    talkback.enableTalkback();
+                    return true;
+                }
+                return false;
+            }
+        });
 
         cameraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            Intent data = result.getData();
-            try {
-                Bitmap photo = (Bitmap) Objects.requireNonNull(Objects.requireNonNull(data).getExtras()).get("data");
-                ivPicture.setImageBitmap(photo);
-                tratamientoImagen(data);
-            } catch (Exception e) {
-                Log.d(TAG, "onActivityResult:" + e.getMessage());
-            }
-        }
+                    Intent data = result.getData();
+                    try {
+                        Bitmap photo = (Bitmap) Objects.requireNonNull(Objects.requireNonNull(data).getExtras()).get("data");
+                        ivPicture.setImageBitmap(photo);
+                        tratamientoImagen(data);
+                    } catch (Exception e) {
+                        Log.d(TAG, "onActivityResult:" + e.getMessage());
+                    }
+                }
 
         );
         galleryLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            Intent data = result.getData();
-            try {
-                tratamientoImagen(Objects.requireNonNull(data));
-            } catch (Exception e) {
-                Log.d(TAG, "onActivityResult:" + e.getMessage());
-            }
-        }
+                    Intent data = result.getData();
+                    try {
+                        tratamientoImagen(Objects.requireNonNull(data));
+                    } catch (Exception e) {
+                        Log.d(TAG, "onActivityResult:" + e.getMessage());
+                    }
+                }
         );
         btnChoosePicture.setOnClickListener(view -> {
             String[] options = {"camara", "galeria"};
@@ -115,12 +137,32 @@ public class MainActivity extends AppCompatActivity {
         });
         decirDescripcion.setOnClickListener(v -> textToSpeech.speak(textTo, TextToSpeech.QUEUE_FLUSH, null, null));
         ivPicture.setOnTouchListener((v, event) -> {
-
             gestureDetector.onTouchEvent(event);
+            String msg;
+            if (imagen!=null && event.getAction() == MotionEvent.ACTION_DOWN) {
+                float x = event.getX();
+                float y = event.getY();
+                try {
+                    tags.join();
+                    Identificador identificador = tags.getIdentificador();
+                    if(coord.zonaVacia(x,y)){
+                        msg = "Estás fuera de la imagen";
+                    }
+                    else{
+                        for(int i=0;i<identificador.getJson().length();i++){
+                            dibujarBoundingBoxes(identificador.getJson().getJSONObject(i));
+                        }
+                        msg = identificador.getObject(coord,(int) x, (int) y,imagen.isGiro());
+                    }
+                    textToSpeech.speak(msg, TextToSpeech.QUEUE_FLUSH, null, null);
+                } catch (JSONException | InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
             return true;
         });
 
-        gestureDetector = new GestureDetector(ivPicture.getContext(), new GestureDetector.SimpleOnGestureListener() {
+        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public void onLongPress(@NonNull MotionEvent e) {
 
@@ -168,38 +210,16 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-            public boolean onSingleTapConfirmed(MotionEvent event){
-                String msg;
-                if (imagen!=null && event.getAction() == MotionEvent.ACTION_DOWN) {
-                    float x = event.getX();
-                    float y = event.getY();
-                    try {
-                        tags.join();
-                        Identificador identificador = tags.getIdentificador();
-                        if(coord.zonaVacia(x,y)){
-                            msg = "Estás fuera de la imagen";
-                        }
-                        else{
-                            for(int i=0;i<identificador.getJson().length();i++){
-                                dibujarBoundingBoxes(identificador.getJson().getJSONObject(i));
-                            }
-                            msg = identificador.getObject(coord,(int) x, (int) y,imagen.isGiro());
-                        }
-                        textToSpeech.speak(msg, TextToSpeech.QUEUE_FLUSH, null, null);
-                    } catch (JSONException | InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                return false;
-            }
+            //}
+
         });
     }
     public void dibujarBoundingBoxes(JSONObject o) throws JSONException {
         int[] ret = coord.convTam(o.getJSONObject("box").getInt("xmin"),
-                    o.getJSONObject("box").getInt("ymin"),
-                    o.getJSONObject("box").getInt("xmax"),
-                    o.getJSONObject("box").getInt("ymax"));
-            rectangleOverlay.addCoordinates(ret);
+                o.getJSONObject("box").getInt("ymin"),
+                o.getJSONObject("box").getInt("xmax"),
+                o.getJSONObject("box").getInt("ymax"));
+        rectangleOverlay.addCoordinates(ret);
     }
 
     private void tratamientoImagen(Intent data) throws IOException {
@@ -218,6 +238,8 @@ public class MainActivity extends AppCompatActivity {
                 firebase.translatedImage(task.getResult().getTexto()).addOnCompleteListener(task2 -> {
                     textTo = task2.getResult().getTexto();
                     textToSpeech.speak(textTo, TextToSpeech.QUEUE_ADD, null, null);
+                    talkback.disableTalkback();
+                    talkback_activado=false;
                 });
             } catch (IOException e) {
                 throw new RuntimeException(e);
