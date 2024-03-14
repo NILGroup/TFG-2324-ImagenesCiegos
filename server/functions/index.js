@@ -19,7 +19,7 @@ async function descriptor(data) {
 
 async function tagging(data) {
 	const response = await fetch(
-		"https://api-inference.huggingface.co/models/facebook/detr-resnet-50",
+		"https://api-inference.huggingface.co/models/facebook/detr-resnet-101",
 		{
 			headers: { Authorization: "Bearer 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" },
 			method: "POST",
