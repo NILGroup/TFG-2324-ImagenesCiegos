@@ -64,9 +64,9 @@ public class MainActivity extends AppCompatActivity {
     private HiloTag tags;
     private GestureDetector gestureDetector;
 
-    private Talkback talkback;
+    //private Talkback talkback;
 
-    private boolean talkback_activado=true;
+    //private boolean talkback_activado=true;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -81,10 +81,10 @@ public class MainActivity extends AppCompatActivity {
 
         firebase = new FireFunctions();
         textToSpeech = new TextToSpeech(this, status -> {});
-        talkback = new Talkback(this);
+        //talkback = new Talkback(this);
 
         // Listener para las teclas de volumen
-        View rootView = findViewById(android.R.id.content);
+        /*View rootView = findViewById(android.R.id.content);
         rootView.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 return false;
             }
-        });
+        });*/
 
         cameraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                     Intent data = result.getData();
@@ -138,31 +138,10 @@ public class MainActivity extends AppCompatActivity {
         decirDescripcion.setOnClickListener(v -> textToSpeech.speak(textTo, TextToSpeech.QUEUE_FLUSH, null, null));
         ivPicture.setOnTouchListener((v, event) -> {
             gestureDetector.onTouchEvent(event);
-            String msg;
-            if (imagen!=null && event.getAction() == MotionEvent.ACTION_DOWN) {
-                float x = event.getX();
-                float y = event.getY();
-                try {
-                    tags.join();
-                    Identificador identificador = tags.getIdentificador();
-                    if(coord.zonaVacia(x,y)){
-                        msg = "Estás fuera de la imagen";
-                    }
-                    else{
-                        for(int i=0;i<identificador.getJson().length();i++){
-                            dibujarBoundingBoxes(identificador.getJson().getJSONObject(i));
-                        }
-                        msg = identificador.getObject(coord,(int) x, (int) y,imagen.isGiro());
-                    }
-                    textToSpeech.speak(msg, TextToSpeech.QUEUE_FLUSH, null, null);
-                } catch (JSONException | InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
             return true;
         });
 
-        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+        gestureDetector = new GestureDetector(ivPicture.getContext(), new GestureDetector.SimpleOnGestureListener() {
             @Override
             public void onLongPress(@NonNull MotionEvent e) {
 
@@ -210,8 +189,30 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-            //}
-
+            public boolean onSingleTapConfirmed(@NonNull MotionEvent event){
+                String msg;
+                if (imagen!=null && event.getAction() == MotionEvent.ACTION_DOWN) {
+                    float x = event.getX();
+                    float y = event.getY();
+                    try {
+                        tags.join();
+                        Identificador identificador = tags.getIdentificador();
+                        if(coord.zonaVacia(x,y)){
+                            msg = "Estás fuera de la imagen";
+                        }
+                        else{
+                            for(int i=0;i<identificador.getJson().length();i++){
+                                dibujarBoundingBoxes(identificador.getJson().getJSONObject(i));
+                            }
+                            msg = identificador.getObject(coord,(int) x, (int) y,imagen.isGiro());
+                        }
+                        textToSpeech.speak(msg, TextToSpeech.QUEUE_FLUSH, null, null);
+                    } catch (JSONException | InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                return false;
+            }
         });
     }
     public void dibujarBoundingBoxes(JSONObject o) throws JSONException {
@@ -238,8 +239,8 @@ public class MainActivity extends AppCompatActivity {
                 firebase.translatedImage(task.getResult().getTexto()).addOnCompleteListener(task2 -> {
                     textTo = task2.getResult().getTexto();
                     textToSpeech.speak(textTo, TextToSpeech.QUEUE_ADD, null, null);
-                    talkback.disableTalkback();
-                    talkback_activado=false;
+                    //talkback.disableTalkback();
+                    //talkback_activado=false;
                 });
             } catch (IOException e) {
                 throw new RuntimeException(e);
