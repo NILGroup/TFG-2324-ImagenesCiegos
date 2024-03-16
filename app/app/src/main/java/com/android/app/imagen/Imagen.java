@@ -20,10 +20,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
 import java.util.Objects;
+import androidx.palette.graphics.Palette;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 public class Imagen {
     protected Uri imageUri;
     private String base64;
+    private Bitmap bmap;
     private float height,width;
     private float ratio;
     private boolean giro;
@@ -34,6 +38,9 @@ public class Imagen {
         this.imageUri=imageUri;
         this.contexto=contexto;
         codBase64(imageUri);
+        convertirABitmap(imageUri);
+        extraerColorDominante();
+
     }
     public String getBase64() {return base64;}
     public float getHeight() {return height;}
@@ -54,6 +61,22 @@ public class Imagen {
         // Convertir el array de bytes a base64
         base64 = Base64.getEncoder().encodeToString(byteArray);
         inputStream.close();
+    }
+    private void convertirABitmap(Uri uri) throws IOException {
+        InputStream inputStream = contexto.getContentResolver().openInputStream(uri);
+        bmap = BitmapFactory.decodeStream(inputStream);
+    }
+    private void extraerColorDominante() {
+        Bitmap bitmap = bmap;
+        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+            @Override
+            public void onGenerated(Palette palette) {
+                Palette.Swatch colorDominante = palette.getDominantSwatch();
+                if (colorDominante != null) {
+                    System.out.println("ColorDominante"+ "El color dominante es: " + colorDominante.getRgb());
+                }
+            }
+        });
     }
 
     public boolean rotarImagen(Intent data, ImageView ivPicture) throws IOException {
