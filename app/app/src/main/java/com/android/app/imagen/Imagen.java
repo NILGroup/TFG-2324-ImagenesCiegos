@@ -23,6 +23,8 @@ import java.util.Objects;
 import androidx.palette.graphics.Palette;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
+
 
 public class Imagen {
     protected Uri imageUri;
@@ -73,7 +75,9 @@ public class Imagen {
             public void onGenerated(Palette palette) {
                 Palette.Swatch colorDominante = palette.getDominantSwatch();
                 if (colorDominante != null) {
-                    System.out.println("ColorDominante"+ "El color dominante es: " + colorDominante.getRgb());
+                    String hexColor = String.format("#%06X", (0xFFFFFF & colorDominante.getRgb()));
+                    ColorClassifier colorclass = new ColorClassifier();
+                    Log.d("ColorDominante", "El color dominante es: " + colorclass.classifyColor(hexColor));
                 }
             }
         });
