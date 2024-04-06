@@ -9,10 +9,13 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -36,8 +39,13 @@ import com.android.app.server.Identificador;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
@@ -100,19 +108,23 @@ public class MainActivity extends AppCompatActivity {
         cameraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                     Intent data = result.getData();
                     try {
-                        Bitmap photo = (Bitmap) Objects.requireNonNull(Objects.requireNonNull(data).getExtras()).get("data");
-                        ivPicture.setImageBitmap(photo);
-                        tratamientoImagen(data);
+                        //Bitmap photo = (Bitmap) Objects.requireNonNull(Objects.requireNonNull(data).getExtras()).get("data");
+                        Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
+                        ivPicture.setImageBitmap(imageBitmap);
+                        Uri imageUri = saveImageToExternalStorage(imageBitmap);
+                        imagen = new Imagen(MainActivity.this,imageUri);
+                        tratamientoImagen(imagen);
                     } catch (Exception e) {
                         Log.d(TAG, "onActivityResult:" + e.getMessage());
                     }
-                }
+                    }
 
         );
         galleryLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                     Intent data = result.getData();
                     try {
-                        tratamientoImagen(Objects.requireNonNull(data));
+                        imagen = new Imagen(MainActivity.this,data.getData());
+                        tratamientoImagen(imagen);
                     } catch (Exception e) {
                         Log.d(TAG, "onActivityResult:" + e.getMessage());
                     }
@@ -223,11 +235,10 @@ public class MainActivity extends AppCompatActivity {
         rectangleOverlay.addCoordinates(ret);
     }
 
-    private void tratamientoImagen(Intent data) throws IOException {
-        imagen = new Imagen(MainActivity.this,data.getData());
+    private void tratamientoImagen(Imagen imagen) throws IOException {
         descripDetallada = new HashMap<>();
         rectangleOverlay.clearRectangles();
-        if(imagen.rotarImagen(data,ivPicture)){
+        if(imagen.rotarImagen(imagen,ivPicture)){
             textToSpeech.speak("La imagen está en horizontal, gire el dispositivo hacia la izquierda", TextToSpeech.QUEUE_FLUSH, null, null);
         }
         coord = new Coordenadas(ivPicture, imagen);
@@ -247,6 +258,44 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    private Uri saveImageToExternalStorage(Bitmap imageBitmap) {
+        // Verificar si el almacenamiento externo está disponible para escribir
+        String state = Environment.getExternalStorageState();
+        if (!Environment.MEDIA_MOUNTED.equals(state)) {
+            Log.e(TAG, "El almacenamiento externo no está disponible para escritura");
+            return null;
+        }
+
+        // Crear un directorio para almacenar las imágenes
+        File directory = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), "NombreDelDirectorio");
+        if (!directory.exists()) {
+            if (!directory.mkdirs()) {
+                Log.e(TAG, "Error al crear el directorio para guardar la imagen");
+                return null;
+            }
+        }
+
+        // Crear un nombre de archivo único para la imagen
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String fileName = "IMG_" + timeStamp + ".jpg";
+
+        // Guardar la imagen en el directorio
+        File imageFile = new File(directory, fileName);
+        try {
+            FileOutputStream fos = new FileOutputStream(imageFile);
+            imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            fos.close();
+            // Devolver la URI del archivo guardado
+            return Uri.fromFile(imageFile);
+        } catch (IOException e) {
+            Log.e(TAG, "Error al guardar la imagen en el almacenamiento externo: " + e.getMessage());
+            return null;
+        }
+    }
+
+
     protected void onDestroy() {
         // Detener la síntesis de voz y liberar recursos de TextToSpeech
         if (textToSpeech != null) {

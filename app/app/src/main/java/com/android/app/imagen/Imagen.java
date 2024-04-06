@@ -1,7 +1,6 @@
 package com.android.app.imagen;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 
 import android.graphics.BitmapRegionDecoder;
@@ -20,10 +19,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
 import java.util.Objects;
-import androidx.palette.graphics.Palette;
-import android.graphics.Bitmap;
+//import androidx.palette.graphics.Palette;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 
 
 public class Imagen {
@@ -41,10 +38,11 @@ public class Imagen {
         this.contexto=contexto;
         codBase64(imageUri);
         convertirABitmap(imageUri);
-        extraerColorDominante();
+        //extraerColorDominante();
 
     }
     public String getBase64() {return base64;}
+    public Uri getUri() {return imageUri;}
     public float getHeight() {return height;}
     public float getWidth() { return width;}
     public float getRatio() { return ratio;}
@@ -68,6 +66,7 @@ public class Imagen {
         InputStream inputStream = contexto.getContentResolver().openInputStream(uri);
         bmap = BitmapFactory.decodeStream(inputStream);
     }
+    /*
     private void extraerColorDominante() {
         Bitmap bitmap = bmap;
         Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
@@ -82,19 +81,19 @@ public class Imagen {
             }
         });
     }
-
-    public boolean rotarImagen(Intent data, ImageView ivPicture) throws IOException {
-        giro = sacarRelacion(data);
+*/
+    public boolean rotarImagen(Imagen imagen, ImageView ivPicture) throws IOException {
+        giro = sacarRelacion(imagen);
         if (giro){
-            Glide.with(contexto.getApplicationContext()).load(data.getData()).apply(new RequestOptions().transform(new Rotate(90))) // Rotación de 90 grados
+            Glide.with(contexto.getApplicationContext()).load(imagen.getUri()).apply(new RequestOptions().transform(new Rotate(90))) // Rotación de 90 grados
                     .into(ivPicture);
             ratio = 1/ratio;
         }
-        else ivPicture.setImageURI(data.getData());
+        else ivPicture.setImageURI(imagen.getUri());
         return giro;
     }
-    private boolean sacarRelacion(Intent data) throws IOException { //Ve si una imagen tiene que ir en vertical o en horizontal
-        ImageDecoder.Source source = ImageDecoder.createSource(contexto.getContentResolver(), Objects.requireNonNull(data.getData()));
+    private boolean sacarRelacion(Imagen imagen) throws IOException { //Ve si una imagen tiene que ir en vertical o en horizontal
+        ImageDecoder.Source source = ImageDecoder.createSource(contexto.getContentResolver(), Objects.requireNonNull(imagen.getUri()));
         Bitmap bitmap = ImageDecoder.decodeBitmap(source);
         height = bitmap.getHeight();
         width = bitmap.getWidth();
