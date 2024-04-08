@@ -8,6 +8,7 @@ import android.graphics.ImageDecoder;
 
 import android.graphics.Rect;
 import android.net.Uri;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -21,6 +22,8 @@ import java.util.Base64;
 import java.util.Objects;
 //import androidx.palette.graphics.Palette;
 import android.graphics.BitmapFactory;
+
+import androidx.palette.graphics.Palette;
 
 
 public class Imagen {
@@ -38,7 +41,7 @@ public class Imagen {
         this.contexto=contexto;
         codBase64(imageUri);
         convertirABitmap(imageUri);
-        //extraerColorDominante();
+        extraerColorDominante();
 
     }
     public String getBase64() {return base64;}
@@ -66,7 +69,7 @@ public class Imagen {
         InputStream inputStream = contexto.getContentResolver().openInputStream(uri);
         bmap = BitmapFactory.decodeStream(inputStream);
     }
-    /*
+
     private void extraerColorDominante() {
         Bitmap bitmap = bmap;
         Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
@@ -81,7 +84,7 @@ public class Imagen {
             }
         });
     }
-*/
+
     public boolean rotarImagen(Imagen imagen, ImageView ivPicture) throws IOException {
         giro = sacarRelacion(imagen);
         if (giro){
