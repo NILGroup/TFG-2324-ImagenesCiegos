@@ -56,6 +56,19 @@ async function getGenero(data) {
 	);
 	const result = await response.json();
 	return result;
+	
+}
+async function getEdad(data){
+	const response = await fetch(
+		"https://api-inference.huggingface.co/models/dima806/faces_age_detection",
+		{
+			headers: { Authorization: "Bearer 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" },
+			method: "POST",
+			body: data,
+		}
+	);
+	const result = await response.json();
+	return result;
 }
 exports.genero = onCall((data, response) => {
 	console.log("Función de genero conectada");
@@ -63,6 +76,15 @@ exports.genero = onCall((data, response) => {
 	const buffer  = Buffer.from(base64,'base64');
 
 	return getGenero(buffer).then((response) => {
+		return JSON.stringify(response);
+	});
+});
+exports.edad = onCall((data, response) => {
+	console.log("Función de edad conectada");
+	const base64 = data.url;
+	const buffer  = Buffer.from(base64,'base64');
+
+	return getEdad(buffer).then((response) => {
 		return JSON.stringify(response);
 	});
 });

@@ -110,25 +110,33 @@ public class Identificador extends Query{
                     firebase.generoPersona(corte).addOnCompleteListener(task -> {
                         newNewLabels.add(finalNuevaEtiqueta);
                         try {
-                            String e = finalNuevaEtiqueta + task.getResult().getTexto();
-                            e = e.replace("persona","");
-                            if(Character.isDigit(e.charAt(0))){
-                                e+=e.charAt(0);
-                                e = (String) e.subSequence(1,e.length());
-                            }
-                            h.put(finalJ,e);
-                            json.getJSONObject(finalJ).put("label", h.get(finalJ));
-                        } catch (JSONException e) {
+                            firebase.edadPersona(corte).addOnCompleteListener(task1 -> {
+                                String s = finalNuevaEtiqueta + task.getResult().getTexto() + task1.getResult().getTexto();
+                                String persona= construirPersona(s) ;
+                                h.put(finalJ,persona);
+                                try {
+                                    json.getJSONObject(finalJ).put("label", h.get(finalJ));
+                                } catch (JSONException ex) {
+                                    throw new RuntimeException(ex);
+                                }
+                            });
+
+                        } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
                     });
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-
             }
-
         }
+    }private String construirPersona(String persona){
+        persona = persona.replace("persona","");
+        if(Character.isDigit(persona.charAt(0))){
+            persona+=" " + persona.charAt(0);
+            persona = (String) persona.subSequence(1,persona.length());
+        }
+       return persona;
     }
     private int distanciaManhattan(Coordenadas coord, JSONObject box, int x, int y) throws JSONException {
         int[] ret = coord.convTam(box.getInt("xmin"),box.getInt("ymin"),box.getInt("xmax"),box.getInt("ymax"));

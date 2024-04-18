@@ -42,5 +42,11 @@ public class FireFunctions {
         data.put("url", name);
         return fFunc.getHttpsCallable("genero").call(data).continueWith(task -> new Genero((String) task.getResult().getData()));
     }
+    public Task<Edad> edadPersona(String name) throws IOException {
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("url", name);
+        return fFunc.getHttpsCallable("edad").call(data).continueWith(task -> new Edad((String) task.getResult().getData()));
+    }
 
 }
