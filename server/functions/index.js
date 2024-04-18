@@ -17,6 +17,8 @@ async function descriptor(data) {
 	return result;
 }
 
+
+
 async function tagging(data) {
 	const response = await fetch(
 		"https://api-inference.huggingface.co/models/facebook/detr-resnet-50",
@@ -42,6 +44,28 @@ async function query(data) {
 	const result = await response.json();
 	return result;
 }
+
+async function getGenero(data) {
+	const response = await fetch(
+		"https://api-inference.huggingface.co/models/dima806/man_woman_face_image_detection",
+		{
+			headers: { Authorization: "Bearer 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" },
+			method: "POST",
+			body: data,
+		}
+	);
+	const result = await response.json();
+	return result;
+}
+exports.genero = onCall((data, response) => {
+	console.log("Función de genero conectada");
+	const base64 = data.url;
+	const buffer  = Buffer.from(base64,'base64');
+
+	return getGenero(buffer).then((response) => {
+		return JSON.stringify(response);
+	});
+});
 
 exports.descripImagen = onCall((data, response) => {
 	console.log("Función de analisis conectada");

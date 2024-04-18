@@ -9,7 +9,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -19,20 +18,16 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.GestureDetector;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import android.speech.tts.TextToSpeech;
 
-import com.android.app.Hilo.HiloDescrip;
 import com.android.app.Hilo.HiloTag;
 import com.android.app.imagen.Coordenadas;
 import com.android.app.imagen.Imagen;
 import com.android.app.imagen.RectangleOverlay;
-import com.android.app.imagen.Talkback;
 import com.android.app.server.FireFunctions;
 import com.android.app.server.Identificador;
 
@@ -46,7 +41,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -242,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
             textToSpeech.speak("La imagen está en horizontal, gire el dispositivo hacia la izquierda", TextToSpeech.QUEUE_FLUSH, null, null);
         }
         coord = new Coordenadas(ivPicture, imagen);
-        tags = new HiloTag(imagen.getBase64(),firebase);
+        tags = new HiloTag(imagen.getBase64(),firebase,imagen);
         tags.start();
         textToSpeech.speak("Obteniendo descripción", TextToSpeech.QUEUE_ADD, null, null);
         firebase.callImagen(imagen.getBase64()).addOnCompleteListener(task -> {

@@ -1,19 +1,27 @@
 package com.android.app.server;
 
+
 import com.android.app.imagen.Coordenadas;
+import com.android.app.imagen.Imagen;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class Identificador extends Query{
-
-    public Identificador(String input) throws JSONException {
+    Imagen imagen;
+    FireFunctions firebase;
+    public Identificador(String input, Imagen _imagen) throws JSONException{
         super(input);
+        imagen = _imagen;
+        firebase = new FireFunctions();
         texto = getLabels();
+
     }
     private String getLabels() throws JSONException {
         StringBuilder ret = new StringBuilder();
@@ -26,6 +34,16 @@ public class Identificador extends Query{
         }
         return ret.toString();
     }
+    public String getGenero(JSONObject box) throws JSONException{
+        int coords[] = new int[4];
+        coords[0] = box.getInt("xmin");
+        coords[1] = box.getInt("ymin");
+        coords[2] = box.getInt("xmax");
+        coords[3] = box.getInt("ymax");
+        return imagen.cortar(coords);
+    }
+
+
 
     public String getObject(Coordenadas coord, int x, int y,boolean giro) throws JSONException {
         StringBuilder ret = new StringBuilder();
@@ -60,29 +78,56 @@ public class Identificador extends Query{
        return ret;
     }
 
-
-    public void setTexto(String input) throws JSONException {
+    public void setTexto(String input) throws JSONException, IOException, InterruptedException {
 
         String[] lista = input.replaceAll("\"","").split(",");
         List<String> newLabels = Arrays.asList(lista);
         List<String> newNewLabels = new ArrayList<>();
-
+        HashMap<Integer,String> h = new HashMap<>();
         //Para añadir sufijo cuaando dos objetos tengan el mismo nombre
-        for(int j=0;j<json.length();j++){
-                String nuevaEtiqueta = newLabels.get(j);
-                nuevaEtiqueta=  nuevaEtiqueta.trim();
-                if (newNewLabels.contains(nuevaEtiqueta)) {
-                    int sufijo = 1;
-                    while (newNewLabels.contains(nuevaEtiqueta + sufijo)) {
-                        sufijo++;
-                    }
-                    nuevaEtiqueta = nuevaEtiqueta + sufijo;
+        for(int j=0;j<json.length();j++) {
+            String nuevaEtiqueta = newLabels.get(j);
+            nuevaEtiqueta = nuevaEtiqueta.trim();
+            if (newNewLabels.contains(nuevaEtiqueta)) {
+                int sufijo = 1;
+                while (newNewLabels.contains(nuevaEtiqueta + sufijo)) {
+                    sufijo++;
                 }
+                nuevaEtiqueta = nuevaEtiqueta + sufijo;
                 newNewLabels.add(nuevaEtiqueta);
-        }
+                h.put(j, nuevaEtiqueta);
+                json.getJSONObject(j).put("label", newNewLabels.get(j));
+            } else {
+                newNewLabels.add(nuevaEtiqueta);
+                h.put(j, nuevaEtiqueta);
+                json.getJSONObject(j).put("label", h.get(j));
+            }
+            if (nuevaEtiqueta.contains("persona")) {
+                String corte = getGenero(json.getJSONObject(j).getJSONObject("box"));
+                try {
+                    int finalJ = j;
+                    String finalNuevaEtiqueta = nuevaEtiqueta;
+                    firebase.generoPersona(corte).addOnCompleteListener(task -> {
+                        newNewLabels.add(finalNuevaEtiqueta);
+                        try {
+                            String e = finalNuevaEtiqueta + task.getResult().getTexto();
+                            e = e.replace("persona","");
+                            if(Character.isDigit(e.charAt(0))){
+                                e+=e.charAt(0);
+                                e = (String) e.subSequence(1,e.length());
+                            }
+                            h.put(finalJ,e);
+                            json.getJSONObject(finalJ).put("label", h.get(finalJ));
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
 
-        for(int i = 0; i<json.length(); i++){
-            json.getJSONObject(i).put("label", newNewLabels.get(i));
+            }
+
         }
     }
     private int distanciaManhattan(Coordenadas coord, JSONObject box, int x, int y) throws JSONException {
@@ -103,5 +148,12 @@ public class Identificador extends Query{
         }
         return x> ret[0]  && x<ret[2] &&
                 y> ret[1] && y<ret[3];
+    }
+    public String sisisi(String s){
+        s = s.replace('"',' ');
+        s = s.replace(',',' ');
+        s = s.replace("   ", "\",\"");
+        s= s.replace(" ", "");
+        return s;
     }
 }
