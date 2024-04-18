@@ -41,7 +41,6 @@ public class Imagen {
         this.contexto=contexto;
         codBase64(imageUri);
         convertirABitmap(imageUri);
-        extraerColorDominante();
 
     }
     public String getBase64() {return base64;}
@@ -70,20 +69,33 @@ public class Imagen {
         bmap = BitmapFactory.decodeStream(inputStream);
     }
 
-    private void extraerColorDominante() {
-        Bitmap bitmap = bmap;
-        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-            @Override
-            public void onGenerated(Palette palette) {
-                Palette.Swatch colorDominante = palette.getDominantSwatch();
-                if (colorDominante != null) {
-                    String hexColor = String.format("#%06X", (0xFFFFFF & colorDominante.getRgb()));
-                    ColorClassifier colorclass = new ColorClassifier();
-                    Log.d("ColorDominante", "El color dominante es: " + colorclass.classifyColor(hexColor));
-                }
+    public String extraerColorDominante(String base64) {
+        String aux="";
+        // Decodificar la cadena base64 en un array de bytes
+        byte[] imageBytes = Base64.getDecoder().decode(base64);
+
+        // Convertir los bytes decodificados en un Bitmap
+        Bitmap bitmap = null;
+        try {
+            bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (bitmap != null) {
+            Palette palette = Palette.from(bitmap).generate();
+            Palette.Swatch colorDominante = palette.getDominantSwatch();
+            if (colorDominante != null) {
+                String hexColor = String.format("#%06X", (0xFFFFFF & colorDominante.getRgb()));
+                ColorClassifier colorclass = new ColorClassifier();
+                Log.d("ColorDominante", "El color dominante es: " + colorclass.classifyColor(hexColor));
+                aux = colorclass.classifyColor(hexColor);
             }
-        });
+        }
+        return aux;
     }
+
+
 
     public boolean rotarImagen(Imagen imagen, ImageView ivPicture) throws IOException {
         giro = sacarRelacion(imagen);

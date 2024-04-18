@@ -200,19 +200,28 @@ public class MainActivity extends AppCompatActivity {
                 if (imagen!=null && event.getAction() == MotionEvent.ACTION_DOWN) {
                     float x = event.getX();
                     float y = event.getY();
+
                     try {
                         tags.join();
+                        int[] box;
+                        String aux="";
                         Identificador identificador = tags.getIdentificador();
+                        box = identificador.getObjectBox(coord, (int) x, (int) y,imagen.isGiro());
                         if(coord.zonaVacia(x,y)){
                             msg = "Estás fuera de la imagen";
                         }
                         else{
+                            Imagen imagen2 = imagen;
+
                             for(int i=0;i<identificador.getJson().length();i++){
                                 dibujarBoundingBoxes(identificador.getJson().getJSONObject(i));
+
+                                aux = imagen2.extraerColorDominante(imagen2.cortar(box));
+
                             }
                             msg = identificador.getObject(coord,(int) x, (int) y,imagen.isGiro());
                         }
-                        textToSpeech.speak(msg, TextToSpeech.QUEUE_FLUSH, null, null);
+                        textToSpeech.speak(msg + aux, TextToSpeech.QUEUE_FLUSH, null, null);
                     } catch (JSONException | InterruptedException e) {
                         throw new RuntimeException(e);
                     }
@@ -227,6 +236,7 @@ public class MainActivity extends AppCompatActivity {
                 o.getJSONObject("box").getInt("xmax"),
                 o.getJSONObject("box").getInt("ymax"));
         rectangleOverlay.addCoordinates(ret);
+
     }
 
     private void tratamientoImagen(Imagen imagen) throws IOException {
