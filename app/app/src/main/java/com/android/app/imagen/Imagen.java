@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
 import java.util.Objects;
-//import androidx.palette.graphics.Palette;
 import android.graphics.BitmapFactory;
 
 import androidx.palette.graphics.Palette;
@@ -29,7 +28,6 @@ import androidx.palette.graphics.Palette;
 public class Imagen {
     protected Uri imageUri;
     private String base64;
-    private Bitmap bmap;
     private float height,width;
     private float ratio;
     private boolean giro;
@@ -66,7 +64,7 @@ public class Imagen {
     }
     private void convertirABitmap(Uri uri) throws IOException {
         InputStream inputStream = contexto.getContentResolver().openInputStream(uri);
-        bmap = BitmapFactory.decodeStream(inputStream);
+        Bitmap bmap = BitmapFactory.decodeStream(inputStream);
     }
 
     public String extraerColorDominante(String base64) {

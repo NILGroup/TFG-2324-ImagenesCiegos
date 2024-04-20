@@ -1,5 +1,7 @@
 package com.android.app.server;
 
+import androidx.annotation.NonNull;
+
 import org.json.JSONException;
 
 public class Edad extends Query{
@@ -32,6 +34,7 @@ public class Edad extends Query{
         }
         return sol;
     }
+    @NonNull
     public String toString() {
         return texto;
     }

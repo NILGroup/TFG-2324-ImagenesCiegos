@@ -1,5 +1,7 @@
 package com.android.app.server;
 
+import androidx.annotation.NonNull;
+
 import org.json.JSONException;
 
 public class Genero extends Query{
@@ -15,7 +17,7 @@ public class Genero extends Query{
     }
 
     private String GeneroMasSeguro() throws JSONException {
-        String sol = "";
+        String sol;
         double score = json.getJSONObject(0).getDouble("score");
         double score1 = json.getJSONObject(1).getDouble("score");
         if(score > score1){
@@ -31,6 +33,7 @@ public class Genero extends Query{
         }
         return sol;
     }
+    @NonNull
     public String toString() {
         return texto;
     }

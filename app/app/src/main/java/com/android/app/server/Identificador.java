@@ -35,7 +35,7 @@ public class Identificador extends Query{
         return ret.toString();
     }
     public String getGenero(JSONObject box) throws JSONException{
-        int coords[] = new int[4];
+        int[] coords = new int[4];
         coords[0] = box.getInt("xmin");
         coords[1] = box.getInt("ymin");
         coords[2] = box.getInt("xmax");
@@ -53,7 +53,7 @@ public class Identificador extends Query{
                 ret.append(json.getJSONObject(i).getString("label")).append(",");
             }
         }
-        if(ret.toString().equals(""))
+        if(ret.toString().isEmpty())
             return "No hay ningún objeto";
         else
             return ret.toString();

@@ -66,10 +66,6 @@ public class MainActivity extends AppCompatActivity {
     private HiloTag tags;
     private GestureDetector gestureDetector;
 
-    //private Talkback talkback;
-
-    //private boolean talkback_activado=true;
-
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,21 +79,6 @@ public class MainActivity extends AppCompatActivity {
 
         firebase = new FireFunctions();
         textToSpeech = new TextToSpeech(this, status -> {});
-        //talkback = new Talkback(this);
-
-        // Listener para las teclas de volumen
-        /*View rootView = findViewById(android.R.id.content);
-        rootView.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                // Verifica si la tecla presionada es de volumen y si talkback_activado está a true
-                if ((keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) && !talkback_activado) {
-                    talkback.enableTalkback();
-                    return true;
-                }
-                return false;
-            }
-        });*/
 
         cameraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                     Intent data = result.getData();
@@ -168,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
                         int[] box;
                         try {
                             String objeto = identificador.getObject(coord,(int) x, (int) y,imagen.isGiro());
-                            if(!objeto.equals("") && descripDetallada.containsKey(objeto)){
+                            if(!objeto.isEmpty() && descripDetallada.containsKey(objeto)){
                                 textToSpeech.speak(descripDetallada.get(objeto), TextToSpeech.QUEUE_ADD, null, null);
                             }
                             else {
@@ -254,8 +235,6 @@ public class MainActivity extends AppCompatActivity {
                 firebase.translatedImage(task.getResult().getTexto()).addOnCompleteListener(task2 -> {
                     textTo = task2.getResult().getTexto();
                     textToSpeech.speak(textTo, TextToSpeech.QUEUE_ADD, null, null);
-                    //talkback.disableTalkback();
-                    //talkback_activado=false;
                 });
             } catch (IOException e) {
                 throw new RuntimeException(e);
