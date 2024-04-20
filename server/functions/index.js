@@ -33,12 +33,13 @@ async function tagging(data) {
 }
 
 async function query(data) {
+
 	const response = await fetch(
 		"https://api-inference.huggingface.co/models/Helsinki-NLP/opus-mt-en-es",
 		{
 			headers: { Authorization: "Bearer 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" },
 			method: "POST",
-			body: JSON.stringify(data),
+			body: JSON.stringify(data)
 		}
 	);
 	const result = await response.json();
