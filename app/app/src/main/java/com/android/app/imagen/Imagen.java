@@ -18,7 +18,9 @@ import com.bumptech.glide.request.RequestOptions;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Objects;
 import android.graphics.BitmapFactory;
 
@@ -31,6 +33,7 @@ public class Imagen {
     private float height,width;
     private float ratio;
     private boolean giro;
+    private HashMap<String, String> croppedImages = new HashMap<>();
     protected Context contexto;
 
     public Imagen(Context contexto, Uri imageUri) throws IOException {
@@ -86,7 +89,6 @@ public class Imagen {
             if (colorDominante != null) {
                 String hexColor = String.format("#%06X", (0xFFFFFF & colorDominante.getRgb()));
                 ColorClassifier colorclass = new ColorClassifier();
-                Log.d("ColorDominante", "El color dominante es: " + colorclass.classifyColor(hexColor));
                 aux = colorclass.classifyColor(hexColor);
             }
         }
@@ -115,10 +117,18 @@ public class Imagen {
     }
 
     public String cortar(int[] coords) {
-        // Decodificar la cadena base64 en un array de bytes
-        byte[] imageBytes = Base64.getDecoder().decode(base64);
+        // Crear una cadena a partir de las coordenadas
+        String coordsString = Arrays.toString(coords);
 
-        // Crear una región decodificadora para la imagen completa
+        // Verificar si la imagen ya ha sido recortada
+        if (croppedImages.containsKey(coordsString)) {
+            Log.d("La imagen ya estaba guardada", croppedImages.get(coordsString));
+            // Si ya ha sido recortada, devolver la imagen almacenada
+            return croppedImages.get(coordsString);
+        }
+
+        // Si no ha sido recortada, proceder con el recorte
+        byte[] imageBytes = Base64.getDecoder().decode(base64);
         BitmapRegionDecoder regionDecoder = null;
         try {
             regionDecoder = BitmapRegionDecoder.newInstance(imageBytes, 0, imageBytes.length, false);
@@ -126,17 +136,15 @@ public class Imagen {
             e.printStackTrace();
         }
 
-        // Crear un rectángulo que define la región a cortar
         Rect cropRect = new Rect(coords[0], coords[1], coords[0] + coords[2], coords[1] + coords[3]);
-
-        // Decodificar la región específica
         assert regionDecoder != null;
         Bitmap croppedBitmap = regionDecoder.decodeRegion(cropRect, null);
-
-        // Convertir el bitmap recortado a una cadena Base64
         String croppedBase64 = encodeBitmapToBase64(croppedBitmap);
 
-        // Liberar recursos
+        // Almacenar la imagen recortada en el HashMap
+        croppedImages.put(coordsString, croppedBase64);
+        Log.d("Almacenado", croppedImages.get(coordsString));
+
         regionDecoder.recycle();
         croppedBitmap.recycle();
 

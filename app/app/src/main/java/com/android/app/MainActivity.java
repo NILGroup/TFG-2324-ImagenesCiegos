@@ -196,11 +196,12 @@ public class MainActivity extends AppCompatActivity {
 
                             for(int i=0;i<identificador.getJson().length();i++){
                                 dibujarBoundingBoxes(identificador.getJson().getJSONObject(i));
-
-                                aux = imagen2.extraerColorDominante(imagen2.cortar(box));
-
                             }
+
                             msg = identificador.getObject(coord,(int) x, (int) y,imagen.isGiro());
+                            aux = imagen2.extraerColorDominante(imagen2.cortar(box));
+
+
                         }
                         textToSpeech.speak(msg + aux, TextToSpeech.QUEUE_FLUSH, null, null);
                     } catch (JSONException | InterruptedException e) {
