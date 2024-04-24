@@ -43,8 +43,6 @@ public class Identificador extends Query{
         return imagen.cortar(coords);
     }
 
-
-
     public String getObject(Coordenadas coord, int x, int y,boolean giro) throws JSONException {
         StringBuilder ret = new StringBuilder();
         for(int i = 0; i<json.length(); i++){

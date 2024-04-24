@@ -5,7 +5,6 @@ import android.graphics.Color;
 public class ColorClassifier {
     public String classifyColor(String hexColor) {
         int color = hexToColor(hexColor);
-
         double[] lab = rgbToLab(color);
         double l = lab[0];
         double a = lab[1];
@@ -26,7 +25,7 @@ public class ColorClassifier {
         } else if (l > 70 && Math.abs(a) < 10 && Math.abs(b) < 10) {
             return "Gris";
         } else {
-            return "Desconocido";
+            return "Color desconocido";
         }
     }
 

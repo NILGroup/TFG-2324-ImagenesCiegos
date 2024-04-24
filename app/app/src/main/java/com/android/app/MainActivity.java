@@ -81,30 +81,26 @@ public class MainActivity extends AppCompatActivity {
         textToSpeech = new TextToSpeech(this, status -> {});
 
         cameraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-                    Intent data = result.getData();
-                    try {
-                        //Bitmap photo = (Bitmap) Objects.requireNonNull(Objects.requireNonNull(data).getExtras()).get("data");
-                        Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
-                        ivPicture.setImageBitmap(imageBitmap);
-                        Uri imageUri = saveImageToExternalStorage(imageBitmap);
-                        imagen = new Imagen(MainActivity.this,imageUri);
-                        tratamientoImagen(imagen);
-                    } catch (Exception e) {
-                        Log.d(TAG, "onActivityResult:" + e.getMessage());
-                    }
-                    }
-
-        );
-        galleryLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-                    Intent data = result.getData();
-                    try {
-                        imagen = new Imagen(MainActivity.this,data.getData());
-                        tratamientoImagen(imagen);
-                    } catch (Exception e) {
-                        Log.d(TAG, "onActivityResult:" + e.getMessage());
-                    }
+                Intent data = result.getData();
+                try {
+                    Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
+                    ivPicture.setImageBitmap(imageBitmap);
+                    Uri imageUri = saveImageToExternalStorage(imageBitmap);
+                    imagen = new Imagen(MainActivity.this,imageUri);
+                    tratamientoImagen(imagen);
+                } catch (Exception e) {
+                    Log.d(TAG, "onActivityResult:" + e.getMessage());
                 }
-        );
+        });
+        galleryLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                Intent data = result.getData();
+                try {
+                    imagen = new Imagen(MainActivity.this,data.getData());
+                    tratamientoImagen(imagen);
+                } catch (Exception e) {
+                    Log.d(TAG, "onActivityResult:" + e.getMessage());
+                }
+        });
         btnChoosePicture.setOnClickListener(view -> {
             String[] options = {"camara", "galeria"};
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -192,16 +188,13 @@ public class MainActivity extends AppCompatActivity {
                             msg = "Estás fuera de la imagen";
                         }
                         else{
-                            Imagen imagen2 = imagen;
-
                             for(int i=0;i<identificador.getJson().length();i++){
                                 dibujarBoundingBoxes(identificador.getJson().getJSONObject(i));
                             }
 
                             msg = identificador.getObject(coord,(int) x, (int) y,imagen.isGiro());
-                            aux = imagen2.extraerColorDominante(imagen2.cortar(box));
-
-
+                            if (!(msg.contains("mujer") || msg.contains("hombre")))
+                                aux = imagen.extraerColorDominante(imagen.cortar(box));
                         }
                         textToSpeech.speak(msg + aux, TextToSpeech.QUEUE_FLUSH, null, null);
                     } catch (JSONException | InterruptedException e) {
@@ -278,8 +271,6 @@ public class MainActivity extends AppCompatActivity {
             return null;
         }
     }
-
-
     protected void onDestroy() {
         // Detener la síntesis de voz y liberar recursos de TextToSpeech
         if (textToSpeech != null) {
@@ -289,7 +280,6 @@ public class MainActivity extends AppCompatActivity {
         }
         super.onDestroy();
     }
-
     @Override
     protected void onResume() {
         super.onResume();
