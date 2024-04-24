@@ -94,8 +94,6 @@ public class Imagen {
         return aux;
     }
 
-
-
     public boolean rotarImagen(Imagen imagen, ImageView ivPicture) throws IOException {
         giro = sacarRelacion(imagen);
         if (giro){
