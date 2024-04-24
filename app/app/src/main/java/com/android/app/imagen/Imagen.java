@@ -87,9 +87,8 @@ public class Imagen {
             Palette palette = Palette.from(bitmap).generate();
             Palette.Swatch colorDominante = palette.getDominantSwatch();
             if (colorDominante != null) {
-                String hexColor = String.format("#%06X", (0xFFFFFF & colorDominante.getRgb()));
-                ColorClassifier colorclass = new ColorClassifier();
-                aux = colorclass.classifyColor(hexColor);
+                ColorUtils matchColor  = new ColorUtils();
+                aux = matchColor.getColorNameFromHex(colorDominante.getRgb());
             }
         }
         return aux;
