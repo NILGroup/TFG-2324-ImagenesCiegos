@@ -2,9 +2,11 @@ package com.android.app.imagen;
 
 import android.graphics.Color;
 
+
 public class ColorClassifier {
     public String classifyColor(String hexColor) {
         int color = hexToColor(hexColor);
+
         double[] lab = rgbToLab(color);
         double l = lab[0];
         double a = lab[1];

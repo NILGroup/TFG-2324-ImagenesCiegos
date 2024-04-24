@@ -1,5 +1,7 @@
 package com.android.app;
 
+import static java.lang.Thread.sleep;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -19,6 +21,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
@@ -42,7 +45,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
 
     //Seleccion de imagen
     private static final int CAMERA_PERMISSION_CODE = 223;
@@ -65,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     private Imagen imagen;
     private HiloTag tags;
     private GestureDetector gestureDetector;
+    private static boolean resultadoCallback;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -191,12 +195,12 @@ public class MainActivity extends AppCompatActivity {
                             for(int i=0;i<identificador.getJson().length();i++){
                                 dibujarBoundingBoxes(identificador.getJson().getJSONObject(i));
                             }
-
                             msg = identificador.getObject(coord,(int) x, (int) y,imagen.isGiro());
-                            if (!(msg.contains("mujer") || msg.contains("hombre")))
+                            if (!(msg.contains("mujer") || msg.contains("hombre") || msg.contains("persona")))
                                 aux = imagen.extraerColorDominante(imagen.cortar(box));
                         }
-                        textToSpeech.speak(msg + aux, TextToSpeech.QUEUE_FLUSH, null, null);
+                        String msgFinal = (msg + aux).replace("persona","");
+                        textToSpeech.speak(msgFinal, TextToSpeech.QUEUE_FLUSH, null, null);
                     } catch (JSONException | InterruptedException e) {
                         throw new RuntimeException(e);
                     }
@@ -237,10 +241,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private Uri saveImageToExternalStorage(Bitmap imageBitmap) {
-        // Verificar si el almacenamiento externo está disponible para escribir
         String state = Environment.getExternalStorageState();
         if (!Environment.MEDIA_MOUNTED.equals(state)) {
-            Log.e(TAG, "El almacenamiento externo no está disponible para escritura");
+            Log.e(TAG, "No se puede escribir en almacenamiento externo");
             return null;
         }
 
@@ -249,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
                 Environment.DIRECTORY_PICTURES), "NombreDelDirectorio");
         if (!directory.exists()) {
             if (!directory.mkdirs()) {
-                Log.e(TAG, "Error al crear el directorio para guardar la imagen");
+                Log.e(TAG, "Error al crear el directorio");
                 return null;
             }
         }
@@ -290,4 +293,9 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, requestCode);
         }
     }
+    public void onCallBack(Boolean bool){
+
+    }
+
+
 }

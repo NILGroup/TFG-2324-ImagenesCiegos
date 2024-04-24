@@ -19,7 +19,6 @@ public class Edad extends Query{
 
         if(score > score1 && score > score2){
             sol = json.getJSONObject(0).getString("label");
-
         }else if (score1 > score && score1 > score2){
             sol = json.getJSONObject(1).getString("label");
         }else if(score2 > score1 && score2 > score){

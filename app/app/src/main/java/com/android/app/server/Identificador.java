@@ -34,7 +34,7 @@ public class Identificador extends Query{
         }
         return ret.toString();
     }
-    public String getGenero(JSONObject box) throws JSONException{
+    public String getCortarGenero(JSONObject box) throws JSONException{
         int[] coords = new int[4];
         coords[0] = box.getInt("xmin");
         coords[1] = box.getInt("ymin");
@@ -101,7 +101,7 @@ public class Identificador extends Query{
                 json.getJSONObject(j).put("label", h.get(j));
             }
             if (nuevaEtiqueta.contains("persona")) {
-                String corte = getGenero(json.getJSONObject(j).getJSONObject("box"));
+                String corte = getCortarGenero(json.getJSONObject(j).getJSONObject("box"));
                 try {
                     int finalJ = j;
                     String finalNuevaEtiqueta = nuevaEtiqueta;
@@ -110,8 +110,9 @@ public class Identificador extends Query{
                         try {
                             firebase.edadPersona(corte).addOnCompleteListener(task1 -> {
                                 String s = finalNuevaEtiqueta + task.getResult().getTexto() + task1.getResult().getTexto();
-                                String persona= construirPersona(s) ;
+                                String persona= construirPersona(s);
                                 h.put(finalJ,persona);
+
                                 try {
                                     json.getJSONObject(finalJ).put("label", h.get(finalJ));
                                 } catch (JSONException ex) {
@@ -155,11 +156,5 @@ public class Identificador extends Query{
         return x> ret[0]  && x<ret[2] &&
                 y> ret[1] && y<ret[3];
     }
-    public String sisisi(String s){
-        s = s.replace('"',' ');
-        s = s.replace(',',' ');
-        s = s.replace("   ", "\",\"");
-        s= s.replace(" ", "");
-        return s;
-    }
+
 }
