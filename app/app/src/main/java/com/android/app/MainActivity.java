@@ -196,7 +196,7 @@ public class MainActivity extends AppCompatActivity{
                                 dibujarBoundingBoxes(identificador.getJson().getJSONObject(i));
                             }
                             msg = identificador.getObject(coord,(int) x, (int) y,imagen.isGiro());
-                            if (!(msg.contains("mujer") || msg.contains("hombre") || msg.contains("persona")))
+                            if (!(msg.contains("mujer") || msg.contains("hombre") || msg.contains("persona")) && !msg.equals("No hay ningún objeto"))
                                 aux = imagen.extraerColorDominante(imagen.cortar(box));
                         }
                         String msgFinal = (msg + aux).replace("persona","");
