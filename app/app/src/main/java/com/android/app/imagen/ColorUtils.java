@@ -40,7 +40,7 @@ public class ColorUtils {
 		colorList.add(new ColorName("Blanco", 0xFA, 0xEB, 0xD7));
 		colorList.add(new ColorName("Azul claro", 0x00, 0xFF, 0xFF));
 		colorList.add(new ColorName("Azul Claro", 0x7F, 0xFF, 0xD4));
-		colorList.add(new ColorName("BlncoO", 0xF0, 0xFF, 0xFF));
+		colorList.add(new ColorName("Blnco", 0xF0, 0xFF, 0xFF));
 		colorList.add(new ColorName("Beis", 0xF5, 0xF5, 0xDC));
 		colorList.add(new ColorName("Beis", 0xFF, 0xE4, 0xC4));
 		colorList.add(new ColorName("Beis", 0xFF, 0xEB, 0xCD));
