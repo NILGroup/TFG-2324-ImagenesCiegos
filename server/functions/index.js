@@ -111,7 +111,13 @@ exports.descripImagen = onCall((data, response) => {
 
  exports.traducDescrip = onCall((data, response) => {
 	console.log("Función de traduccion conectada");
-	return query({"inputs": data.texto}).then((response) => {
+	const requestData = {
+        inputs: data.texto,
+        options: {
+            wait_for_model: true 
+        }
+	};
+	return query(requestData).then((response) => {
 		return JSON.stringify(response);
 	});
  });
