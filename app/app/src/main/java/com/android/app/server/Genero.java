@@ -7,13 +7,7 @@ import org.json.JSONException;
 public class Genero extends Query{
     public Genero(String input) throws JSONException {
         super(input);
-        texto = construir();
-    }
-
-    private String construir() throws JSONException {
-        String res;
-        res = GeneroMasSeguro();
-        return res;
+        texto = GeneroMasSeguro();
     }
 
     private String GeneroMasSeguro() throws JSONException {
