@@ -199,7 +199,7 @@ public class MainActivity extends AppCompatActivity{
                             if (!(msg.contains("mujer") || msg.contains("hombre") || msg.contains("persona")) && !msg.equals("No hay ningún objeto"))
                                 aux = imagen.extraerColorDominante(imagen.cortar(box));
                         }
-                        String msgFinal = (msg + aux).replace("persona","");
+                        String msgFinal = (msg + aux).replace("persona","").replace(",","");
                         textToSpeech.speak(msgFinal, TextToSpeech.QUEUE_FLUSH, null, null);
                     } catch (JSONException | InterruptedException e) {
                         throw new RuntimeException(e);

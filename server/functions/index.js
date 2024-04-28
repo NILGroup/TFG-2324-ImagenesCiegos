@@ -76,18 +76,34 @@ exports.genero = onCall((data, response) => {
 	const base64 = data.url;
 	const buffer  = Buffer.from(base64,'base64');
 
-	return getGenero(buffer).then((response) => {
-		return JSON.stringify(response);
-	});
+	function recursive(buffer) {
+        return getGenero(buffer).then((response) => {
+            const jsonResponse = JSON.stringify(response);
+            if (response.error) {
+                return recursive(buffer);
+            } else {
+                return jsonResponse;
+            }
+        });
+    }
+	return recursive(buffer);
 });
 exports.edad = onCall((data, response) => {
 	console.log("Función de edad conectada");
 	const base64 = data.url;
 	const buffer  = Buffer.from(base64,'base64');
 
-	return getEdad(buffer).then((response) => {
-		return JSON.stringify(response);
-	});
+	function recursive(buffer) {
+        return getEdad(buffer).then((response) => {
+            const jsonResponse = JSON.stringify(response);
+            if (response.error) {
+                return recursive(buffer);
+            } else {
+                return jsonResponse;
+            }
+        });
+    }
+	return recursive(buffer);
 });
 
 exports.descripImagen = onCall((data, response) => {
@@ -95,19 +111,37 @@ exports.descripImagen = onCall((data, response) => {
 	const base64 = data.url;
 	const buffer  = Buffer.from(base64,'base64');
 
-	return descriptor(buffer).then((response) => {
-		return JSON.stringify(response);
-	});
+	function recursive(buffer) {
+        return descriptor(buffer).then((response) => {
+            const jsonResponse = JSON.stringify(response);
+            if (response.error) {
+                return recursive(buffer);
+            } else {
+                return jsonResponse;
+            }
+        });
+    }
+	return recursive(buffer);
  });
 
  exports.tagsImagen = onCall((data, response) => {
-	console.log("Función de tags conectada");
-	const base64 = data.url;
-	const buffer  = Buffer.from(base64,'base64');
-	return tagging(buffer).then((response) => {
-		return JSON.stringify(response);
-	});
- });
+    console.log("Función de tags conectada");
+    const base64 = data.url;
+    const buffer  = Buffer.from(base64,'base64');
+    
+    function recursive(buffer) {
+        return tagging(buffer).then((response) => {
+            const jsonResponse = JSON.stringify(response);
+            if (response.error) {
+                return recursive(buffer);
+            } else {
+                return jsonResponse;
+            }
+        });
+    }
+    
+    return recursive(buffer);
+});
 
  exports.traducDescrip = onCall((data, response) => {
 	console.log("Función de traduccion conectada");
