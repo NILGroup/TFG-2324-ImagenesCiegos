@@ -14,17 +14,22 @@ public class Genero extends Query{
         String sol;
         double score = json.getJSONObject(0).getDouble("score");
         double score1 = json.getJSONObject(1).getDouble("score");
-        if(score > score1){
-            sol = json.getJSONObject(0).getString("label");
+        if(score >= 0.6 || score1 >= 0.6){
+            if(score > score1){
+                sol = json.getJSONObject(0).getString("label");
 
+            }else{
+                sol = json.getJSONObject(1).getString("label");
+            }
+            if (sol.equals("man")) {
+                sol = "hombre";
+            } else if (sol.equals("woman")) {
+                sol = "mujer";
+            }
         }else{
-            sol = json.getJSONObject(1).getString("label");
+            sol = "genero no definido";
         }
-        if (sol.equals("man")) {
-            sol = "hombre";
-        } else if (sol.equals("woman")) {
-            sol = "mujer";
-        }
+
         return sol;
     }
     @NonNull
