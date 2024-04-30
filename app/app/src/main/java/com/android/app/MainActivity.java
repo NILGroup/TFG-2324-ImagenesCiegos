@@ -184,9 +184,12 @@ public class MainActivity extends AppCompatActivity{
 
                     try {
                         tags.join();
+
                         int[] box;
                         String aux="";
                         Identificador identificador = tags.getIdentificador();
+
+                        textToSpeech.speak(Identificador.getDescripcionCuan(), TextToSpeech.QUEUE_ADD, null, null);
                         box = identificador.getObjectBox(coord, (int) x, (int) y,imagen.isGiro());
                         if(coord.zonaVacia(x,y)){
                             msg = "Estás fuera de la imagen";
@@ -200,7 +203,7 @@ public class MainActivity extends AppCompatActivity{
                                 aux = imagen.extraerColorDominante(imagen.cortar(box));
                         }
                         String msgFinal = (msg + aux).replace("persona","").replace(",","");
-                        textToSpeech.speak(msgFinal, TextToSpeech.QUEUE_FLUSH, null, null);
+                        textToSpeech.speak(msgFinal, TextToSpeech.QUEUE_ADD, null, null);
                     } catch (JSONException | InterruptedException e) {
                         throw new RuntimeException(e);
                     }

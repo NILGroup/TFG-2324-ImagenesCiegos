@@ -16,6 +16,8 @@ import java.util.List;
 public class Identificador extends Query{
     Imagen imagen;
     FireFunctions firebase;
+    private HashMap<String, Integer> descrpcionCuan = new HashMap<>();
+    private static String descripcionCuantitativa;
     public Identificador(String input, Imagen _imagen) throws JSONException{
         super(input);
         imagen = _imagen;
@@ -82,11 +84,13 @@ public class Identificador extends Query{
         List<String> newLabels = Arrays.asList(lista);
         List<String> newNewLabels = new ArrayList<>();
         HashMap<Integer,String> h = new HashMap<>();
+
         //Para añadir sufijo cuaando dos objetos tengan el mismo nombre
         for(int j=0;j<json.length();j++) {
             String nuevaEtiqueta = newLabels.get(j);
             nuevaEtiqueta = nuevaEtiqueta.trim();
             if (newNewLabels.contains(nuevaEtiqueta)) {
+                descrpcionCuan.put(nuevaEtiqueta,descrpcionCuan.get(nuevaEtiqueta)+1);
                 int sufijo = 1;
                 while (newNewLabels.contains(nuevaEtiqueta + sufijo)) {
                     sufijo++;
@@ -98,8 +102,10 @@ public class Identificador extends Query{
             } else {
                 newNewLabels.add(nuevaEtiqueta);
                 h.put(j, nuevaEtiqueta);
+                descrpcionCuan.put(nuevaEtiqueta,1);
                 json.getJSONObject(j).put("label", h.get(j));
             }
+
             if (nuevaEtiqueta.contains("persona")) {
                 String corte = getCortarGenero(json.getJSONObject(j).getJSONObject("box"));
                 try {
@@ -128,8 +134,42 @@ public class Identificador extends Query{
                     throw new RuntimeException(e);
                 }
             }
+            descripcionCuantitativa = costruirBarrido(descrpcionCuan);
         }
-    }private String construirPersona(String persona){
+    }
+
+    private String costruirBarrido(HashMap<String,Integer> descrpcionCuan) {
+        String sol="Se han detectado ";
+
+        for (String key : descrpcionCuan.keySet()) {
+            List<Character> vocales = new ArrayList<>();
+            vocales.add('a');
+            vocales.add('e');
+            vocales.add('i');
+            vocales.add('o');
+            vocales.add('u');
+            String objeto =key;
+            if(descrpcionCuan.get(key)>1){
+                if(vocales.contains(objeto.charAt(objeto.length()-1)))
+                    sol += descrpcionCuan.get(key) + key +"s, ";
+                else
+                    sol += descrpcionCuan.get(key) + key +"es, ";
+            }else{
+                sol += descrpcionCuan.get(key)+" o una " + key +", ";
+            }
+        }
+        sol = sol.substring(0, sol.length()-2);
+        for(int i = sol.length()-1; i>= 0; i--){
+            if(sol.charAt(i) == ','){
+                sol = sol.substring(0,i) + " y " + sol.substring(i+1);
+                i=-1;
+            }
+        }
+        sol+= " en la imagen";
+        return sol;
+    }
+
+    private String construirPersona(String persona){
         persona = persona.replace("persona","");
         if(Character.isDigit(persona.charAt(0))){
             persona+=" " + persona.charAt(0);
@@ -155,6 +195,9 @@ public class Identificador extends Query{
         }
         return x> ret[0]  && x<ret[2] &&
                 y> ret[1] && y<ret[3];
+    }
+    public static String getDescripcionCuan(){
+        return descripcionCuantitativa;
     }
 
 }
