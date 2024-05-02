@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity{
@@ -181,7 +182,7 @@ public class MainActivity extends AppCompatActivity{
             }
 
             public boolean onSingleTapConfirmed(@NonNull MotionEvent event){
-                String msg;
+                String msg = "";
 
                 if (imagen!=null && event.getAction() == MotionEvent.ACTION_DOWN) {
                     float x = event.getX();
@@ -205,9 +206,14 @@ public class MainActivity extends AppCompatActivity{
                                 for(int i=0;i<identificador.getJson().length();i++){
                                     dibujarBoundingBoxes(identificador.getJson().getJSONObject(i));
                                 }
-                                msg = identificador.getObject(coord,(int) x, (int) y,imagen.isGiro());
-                                if (!(msg.contains("mujer") || msg.contains("hombre") || msg.contains("persona")) && !msg.equals("No hay ningún objeto"))
-                                    aux = imagen.extraerColorDominante(imagen.cortar(box));
+                                List<String> objetos = identificador.getObjects(coord,(int) x, (int) y,imagen.isGiro());
+                                for(String obj: objetos) {
+                                    if (!(obj.contains("mujer") || obj.contains("hombre") || obj.contains("persona")) && !obj.equals("No hay ningún objeto"))
+                                        msg += obj + " " + imagen.extraerColorDominante(imagen.cortar(box))+ ", ";
+                                    else{
+                                        msg += obj + ", ";
+                                    }
+                                }
                             }
                             textToSpeech.speak(msg + aux, TextToSpeech.QUEUE_ADD, null, null);
                         }

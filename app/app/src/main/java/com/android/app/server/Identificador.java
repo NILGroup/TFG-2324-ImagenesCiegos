@@ -200,4 +200,17 @@ public class Identificador extends Query{
         return descripcionCuantitativa;
     }
 
+    public List<String> getObjects(Coordenadas coord, int x, int y, boolean giro) throws JSONException {
+
+        List<String> ret = new ArrayList<String>();
+        for(int i = 0; i<json.length(); i++){
+            if(estaContenido(coord,json.getJSONObject(i).getJSONObject("box"),x,y,giro)){
+
+                ret.add(json.getJSONObject(i).getString("label"));
+            }
+        }
+        if(ret.isEmpty())
+            ret.add("No hay ningún objeto");
+        return ret;
+    }
 }
