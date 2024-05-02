@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity{
     private HiloTag tags;
     private GestureDetector gestureDetector;
     private static boolean resultadoCallback;
+    boolean primeraVez = true;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -91,6 +92,7 @@ public class MainActivity extends AppCompatActivity{
                     ivPicture.setImageBitmap(imageBitmap);
                     Uri imageUri = saveImageToExternalStorage(imageBitmap);
                     imagen = new Imagen(MainActivity.this,imageUri);
+                    primeraVez = true;
                     tratamientoImagen(imagen);
                 } catch (Exception e) {
                     Log.d(TAG, "onActivityResult:" + e.getMessage());
@@ -100,6 +102,7 @@ public class MainActivity extends AppCompatActivity{
                 Intent data = result.getData();
                 try {
                     imagen = new Imagen(MainActivity.this,data.getData());
+                    primeraVez = true;
                     tratamientoImagen(imagen);
                 } catch (Exception e) {
                     Log.d(TAG, "onActivityResult:" + e.getMessage());
@@ -176,7 +179,7 @@ public class MainActivity extends AppCompatActivity{
                     }
                 }
             }
-            boolean primeraVez = true;
+
             public boolean onSingleTapConfirmed(@NonNull MotionEvent event){
                 String msg;
 
@@ -193,21 +196,22 @@ public class MainActivity extends AppCompatActivity{
                         if(primeraVez){
                             textToSpeech.speak(Identificador.getDescripcionCuan(), TextToSpeech.QUEUE_ADD, null, null);
                             primeraVez = false;
-                        }
-                        box = identificador.getObjectBox(coord, (int) x, (int) y,imagen.isGiro());
-                        if(coord.zonaVacia(x,y)){
-                            msg = "Estás fuera de la imagen";
-                        }
-                        else{
-                            for(int i=0;i<identificador.getJson().length();i++){
-                                dibujarBoundingBoxes(identificador.getJson().getJSONObject(i));
+                        }else{
+                            box = identificador.getObjectBox(coord, (int) x, (int) y,imagen.isGiro());
+                            if(coord.zonaVacia(x,y)){
+                                msg = "Estás fuera de la imagen";
                             }
-                            msg = identificador.getObject(coord,(int) x, (int) y,imagen.isGiro());
-                            if (!(msg.contains("mujer") || msg.contains("hombre") || msg.contains("persona")) && !msg.equals("No hay ningún objeto"))
-                                aux = imagen.extraerColorDominante(imagen.cortar(box));
+                            else{
+                                for(int i=0;i<identificador.getJson().length();i++){
+                                    dibujarBoundingBoxes(identificador.getJson().getJSONObject(i));
+                                }
+                                msg = identificador.getObject(coord,(int) x, (int) y,imagen.isGiro());
+                                if (!(msg.contains("mujer") || msg.contains("hombre") || msg.contains("persona")) && !msg.equals("No hay ningún objeto"))
+                                    aux = imagen.extraerColorDominante(imagen.cortar(box));
+                            }
+                            textToSpeech.speak(msg + aux, TextToSpeech.QUEUE_ADD, null, null);
                         }
-                        //String msgFinal = (msg + aux).replace("persona","").replace(",","");
-                        textToSpeech.speak(msg + aux, TextToSpeech.QUEUE_ADD, null, null);
+
                     } catch (JSONException | InterruptedException e) {
                         throw new RuntimeException(e);
                     }
