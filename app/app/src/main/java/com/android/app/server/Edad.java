@@ -29,7 +29,7 @@ public class Edad extends Query{
             } else if (sol.equals("OLD")) {
                 sol = " de avanzada edad";
             }else{
-                sol = "joven";
+                sol = " joven";
             }
         }else{
             sol = " edad no definida";

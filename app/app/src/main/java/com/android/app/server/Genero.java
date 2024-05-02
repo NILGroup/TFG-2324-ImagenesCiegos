@@ -22,9 +22,9 @@ public class Genero extends Query{
                 sol = json.getJSONObject(1).getString("label");
             }
             if (sol.equals("man")) {
-                sol = "hombre";
+                sol = " hombre";
             } else if (sol.equals("woman")) {
-                sol = "mujer";
+                sol = " mujer";
             }
         }else{
             sol = " género no definido";
