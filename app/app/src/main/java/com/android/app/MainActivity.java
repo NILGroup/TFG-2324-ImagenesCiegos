@@ -176,8 +176,10 @@ public class MainActivity extends AppCompatActivity{
                     }
                 }
             }
+            boolean primeraVez = true;
             public boolean onSingleTapConfirmed(@NonNull MotionEvent event){
                 String msg;
+
                 if (imagen!=null && event.getAction() == MotionEvent.ACTION_DOWN) {
                     float x = event.getX();
                     float y = event.getY();
@@ -188,8 +190,10 @@ public class MainActivity extends AppCompatActivity{
                         int[] box;
                         String aux="";
                         Identificador identificador = tags.getIdentificador();
-
-                        textToSpeech.speak(Identificador.getDescripcionCuan(), TextToSpeech.QUEUE_ADD, null, null);
+                        if(primeraVez){
+                            textToSpeech.speak(Identificador.getDescripcionCuan(), TextToSpeech.QUEUE_ADD, null, null);
+                            primeraVez = false;
+                        }
                         box = identificador.getObjectBox(coord, (int) x, (int) y,imagen.isGiro());
                         if(coord.zonaVacia(x,y)){
                             msg = "Estás fuera de la imagen";
@@ -202,8 +206,8 @@ public class MainActivity extends AppCompatActivity{
                             if (!(msg.contains("mujer") || msg.contains("hombre") || msg.contains("persona")) && !msg.equals("No hay ningún objeto"))
                                 aux = imagen.extraerColorDominante(imagen.cortar(box));
                         }
-                        String msgFinal = (msg + aux).replace("persona","").replace(",","");
-                        textToSpeech.speak(msgFinal, TextToSpeech.QUEUE_ADD, null, null);
+                        //String msgFinal = (msg + aux).replace("persona","").replace(",","");
+                        textToSpeech.speak(msg + aux, TextToSpeech.QUEUE_ADD, null, null);
                     } catch (JSONException | InterruptedException e) {
                         throw new RuntimeException(e);
                     }
