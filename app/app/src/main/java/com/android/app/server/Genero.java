@@ -27,7 +27,7 @@ public class Genero extends Query{
                 sol = "mujer";
             }
         }else{
-            sol = "genero no definido";
+            sol = " género no definido";
         }
 
         return sol;

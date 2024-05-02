@@ -32,7 +32,7 @@ public class Edad extends Query{
                 sol = "joven";
             }
         }else{
-            sol = "edad no definida";
+            sol = " edad no definida";
         }
 
         return sol;
