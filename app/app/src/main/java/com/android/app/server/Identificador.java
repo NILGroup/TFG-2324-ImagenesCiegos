@@ -111,6 +111,8 @@ public class Identificador extends Query{
 
             if (nuevaEtiqueta.contains("persona")) {
                 String corte = getCortarGenero(json.getJSONObject(j).getJSONObject("box"));
+                JSONObject obj = json.getJSONObject(j);
+                obj.put("label", obj.getString ("label")+ " pulse otra vez para obtener más información.");
                 try {
                     int finalJ = j;
                     String finalNuevaEtiqueta = nuevaEtiqueta;
@@ -183,7 +185,7 @@ public class Identificador extends Query{
 
     private String construirPersona(String persona){
         if(!persona.contains("definido")) {
-            persona = persona.replace("persona", "");
+            persona = persona.replace("persona", "").replace(" pulse otra vez para obtener más información.","");
             if (Character.isDigit(persona.charAt(0))) {
                 persona = (String) persona.subSequence(2, persona.length());
             }
