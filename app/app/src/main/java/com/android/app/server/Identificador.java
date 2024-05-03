@@ -156,12 +156,7 @@ public class Identificador extends Query{
         String sol="Se han detectado ";
 
         for (String key : descrpcionCuan.keySet()) {
-            List<Character> vocales = new ArrayList<>();
-            vocales.add('a');
-            vocales.add('e');
-            vocales.add('i');
-            vocales.add('o');
-            vocales.add('u');
+            List<Character> vocales = new ArrayList<>(Arrays.asList('a', 'e', 'i', 'o', 'u'));
             String objeto =key;
             if(descrpcionCuan.get(key)>1){
                 if(vocales.contains(objeto.charAt(objeto.length()-1)))
