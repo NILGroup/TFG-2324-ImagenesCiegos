@@ -1,6 +1,8 @@
 package com.android.app.server;
 
 
+import android.util.Pair;
+
 import com.android.app.imagen.Coordenadas;
 import com.android.app.imagen.Imagen;
 
@@ -200,17 +202,24 @@ public class Identificador extends Query{
         return descripcionCuantitativa;
     }
 
-    public List<String> getObjects(Coordenadas coord, int x, int y, boolean giro) throws JSONException {
+    public List<Pair<String,int[]>> getObjects(Coordenadas coord, int x, int y, boolean giro) throws JSONException {
 
-        List<String> ret = new ArrayList<String>();
+        List<Pair<String,int[]>> ret = new ArrayList<>();
         for(int i = 0; i<json.length(); i++){
-            if(estaContenido(coord,json.getJSONObject(i).getJSONObject("box"),x,y,giro)){
+            JSONObject box= json.getJSONObject(i).getJSONObject("box");
+            if(estaContenido(coord,box,x,y,giro)){
+                int[] coords = new int[4];
+                coords[0] = box.getInt("xmin");
+                coords[1] = box.getInt("ymin");
+                coords[2] = box.getInt("xmax");
+                coords[3] = box.getInt("ymax");
 
-                ret.add(json.getJSONObject(i).getString("label"));
+                Pair<String,int[]> aux = new Pair<>(json.getJSONObject(i).getString("label"),coords);
+                ret.add(aux);
             }
         }
         if(ret.isEmpty())
-            ret.add("No hay ningún objeto");
+            ret.add(new Pair<>("No hay ningún objeto",new int[4]));
         return ret;
     }
 }

@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.util.Pair;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.Window;
@@ -206,10 +207,10 @@ public class MainActivity extends AppCompatActivity{
                                 for(int i=0;i<identificador.getJson().length();i++){
                                     dibujarBoundingBoxes(identificador.getJson().getJSONObject(i));
                                 }
-                                List<String> objetos = identificador.getObjects(coord,(int) x, (int) y,imagen.isGiro());
-                                for(String obj: objetos) {
-                                    if (!(obj.contains("mujer") || obj.contains("hombre") || obj.contains("persona")) && !obj.equals("No hay ningún objeto"))
-                                        msg += obj + " " + imagen.extraerColorDominante(imagen.cortar(box))+ ", ";
+                                List<Pair<String,int[]>> objetos = identificador.getObjects(coord,(int) x, (int) y,imagen.isGiro());
+                                for(Pair<String,int[]> obj: objetos) {
+                                    if (!(obj.first.contains("mujer") || obj.first.contains("hombre") || obj.first.contains("persona")) && !obj.first.equals("No hay ningún objeto"))
+                                        msg += obj + " " + imagen.extraerColorDominante(imagen.cortar(obj.second))+ ", ";
                                     else{
                                         msg += obj + ", ";
                                     }
