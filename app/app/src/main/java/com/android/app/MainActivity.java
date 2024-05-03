@@ -210,9 +210,9 @@ public class MainActivity extends AppCompatActivity{
                                 List<Pair<String,int[]>> objetos = identificador.getObjects(coord,(int) x, (int) y,imagen.isGiro());
                                 for(Pair<String,int[]> obj: objetos) {
                                     if (!(obj.first.contains("mujer") || obj.first.contains("hombre") || obj.first.contains("persona")) && !obj.first.equals("No hay ningún objeto"))
-                                        msg += obj + " " + imagen.extraerColorDominante(imagen.cortar(obj.second))+ ", ";
+                                        msg += obj.first + " " + imagen.extraerColorDominante(imagen.cortar(obj.second))+ ", ";
                                     else{
-                                        msg += obj + ", ";
+                                        msg += obj.first + ", ";
                                     }
                                 }
                             }
