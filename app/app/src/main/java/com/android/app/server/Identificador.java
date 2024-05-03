@@ -86,6 +86,7 @@ public class Identificador extends Query{
         List<String> newLabels = Arrays.asList(lista);
         List<String> newNewLabels = new ArrayList<>();
         HashMap<Integer,String> h = new HashMap<>();
+        HashMap<String,Integer> sufijosPersona = new HashMap<>();
 
         //Para añadir sufijo cuaando dos objetos tengan el mismo nombre
         for(int j=0;j<json.length();j++) {
@@ -119,6 +120,15 @@ public class Identificador extends Query{
                             firebase.edadPersona(corte).addOnCompleteListener(task1 -> {
                                 String s = finalNuevaEtiqueta + task.getResult().getTexto() + task1.getResult().getTexto();
                                 String persona= construirPersona(s);
+
+                                if(sufijosPersona.containsKey(persona.trim()))
+                                    sufijosPersona.put(persona.trim(),sufijosPersona.get(persona.trim())+1);
+                                else{
+                                    sufijosPersona.put(persona.trim(),0);
+                                }
+                                if(sufijosPersona.get(persona.trim()) != 0)
+                                    persona += " " + sufijosPersona.get(persona.trim());
+
                                 h.put(finalJ,persona);
 
                                 try {
@@ -157,7 +167,7 @@ public class Identificador extends Query{
                 else
                     sol += descrpcionCuan.get(key) + key +"es, ";
             }else{
-                sol += descrpcionCuan.get(key)+" o una " + key +", ";
+                sol +=" un o una " + key +", ";
             }
         }
         sol = sol.substring(0, sol.length()-2);
@@ -172,10 +182,11 @@ public class Identificador extends Query{
     }
 
     private String construirPersona(String persona){
-        persona = persona.replace("persona","");
-        if(Character.isDigit(persona.charAt(0))){
-            persona+=" " + persona.charAt(0);
-            persona = (String) persona.subSequence(1,persona.length());
+        if(!persona.contains("definido")) {
+            persona = persona.replace("persona", "");
+            if (Character.isDigit(persona.charAt(0))) {
+                persona = (String) persona.subSequence(2, persona.length());
+            }
         }
        return persona;
     }
