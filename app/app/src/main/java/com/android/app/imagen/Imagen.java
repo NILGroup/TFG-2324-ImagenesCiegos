@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 
 import android.graphics.BitmapRegionDecoder;
+import android.graphics.Color;
 import android.graphics.ImageDecoder;
 
 import android.graphics.Rect;
@@ -86,9 +87,14 @@ public class Imagen {
         if (bitmap != null) {
             Palette palette = Palette.from(bitmap).generate();
             Palette.Swatch colorDominante = palette.getDominantSwatch();
+            int color = colorDominante.getRgb();
+            int r = (color >>24) & 0xFF;
+            int g = (color >>16) & 0xFF;
+            int b = (color >> 8)  & 0xFF;
             if (colorDominante != null) {
                 ColorUtils matchColor  = new ColorUtils();
-                aux = matchColor.getColorNameFromHex(colorDominante.getRgb());
+
+                aux = matchColor.getColorNameFromRgb(r,g,b);
             }
         }
         return aux;
