@@ -119,7 +119,7 @@ public class ColorUtils {
 		colorList.add(new ColorName("Turquesa", 0x48, 0xD1, 0xCC));
 		colorList.add(new ColorName("Azul marino", 0x19, 0x19, 0x70));
 		colorList.add(new ColorName("Blanco", 0xF5, 0xFF, 0xFA));
-		colorList.add(new ColorName("Perla", 0xFF, 0xE4, 0xE1));
+		colorList.add(new ColorName("Marrón", 0xFF, 0xE4, 0xE1));
 		colorList.add(new ColorName("Beis", 0xFF, 0xE4, 0xB5));
 		colorList.add(new ColorName("Beis", 0xFF, 0xDE, 0xAD));
 		colorList.add(new ColorName("Azul marino", 0x00, 0x00, 0x80));

@@ -199,7 +199,7 @@ public class MainActivity extends AppCompatActivity{
                             textToSpeech.speak(Identificador.getDescripcionCuan(), TextToSpeech.QUEUE_ADD, null, null);
                             primeraVez = false;
                         }else{
-                            box = identificador.getObjectBox(coord, (int) x, (int) y,imagen.isGiro());
+                            box = identificador.getObjectBox(coord,  (int) x, (int) y,imagen.isGiro());
                             if(coord.zonaVacia(x,y)){
                                 msg = "Estás fuera de la imagen";
                             }

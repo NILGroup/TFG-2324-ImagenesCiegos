@@ -93,7 +93,6 @@ public class Imagen {
             int b = (color >> 8)  & 0xFF;
             if (colorDominante != null) {
                 ColorUtils matchColor  = new ColorUtils();
-
                 aux = matchColor.getColorNameFromRgb(r,g,b);
             }
         }
