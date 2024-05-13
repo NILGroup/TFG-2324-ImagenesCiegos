@@ -6,19 +6,23 @@ Aplicación móvil para facilitar la interpretación de imágenes a personas con
 
 ## Documentación
 
-[Memoria](https://es.overleaf.com/read/phcbvtdyskyn#6152ba): desarollo completo donde se incluye la investigación y el desarrollo técnico del proyecto.
+Memoria: desarollo completo donde se incluye la investigación y el desarrollo técnico del proyecto.
 1. Introducción
  * Motivación
  * Objetivos
- * Plan de trabajo 
+ * Estructura del Documento
 2. Estado del arte
  * Tecnologías de descripción de imágenes
  * Trabajo de fin de grado anterior
-3. Descripción del trabajo
-4. Conclusiones y trabajo futuro
+3. Funcionamiento de la aplicación
+4. Implementación del sistema
+5. Evaluación
+6. Conclusiones y trabajo futuro
 
 
 ## Instalación
+
+El dispositivo debe conceder permisos para instalar aplicaciones de origen externo antes de proceder con la instalación.
 
 ```bash
   installar app-debug.apk
@@ -29,6 +33,8 @@ Aplicación móvil para facilitar la interpretación de imágenes a personas con
 - [SalesForce Captioning Model](https://huggingface.co/Salesforce/blip-image-captioning-large)
 - [Facebook Object Detection Model](https://huggingface.co/facebook/detr-resnet-50)
 - [Helsinki Translation Model](https://huggingface.co/Helsinki-NLP/opus-mt-en-es)
+- [Man/Woman Face Image Detection Model](https://huggingface.co/dima806/man_woman_face_image_detection)
+- [Face Age Detection](https://huggingface.co/dima806/faces_age_detection)
 
 <img src="https://drive.google.com/uc?export=view&id=1Kkh_AbUtj3N8yPZTo3FoBWMthZAKAfE0"
      alt="Demo" width=75% height=75%>
