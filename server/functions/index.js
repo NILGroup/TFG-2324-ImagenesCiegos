@@ -8,7 +8,7 @@ async function descriptor(data) {
 	const response = await fetch(
 		"https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-large",
 		{
-			headers: { Authorization: "Bearer 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" },
+			headers: { Authorization: "Bearer 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" },
 			method: "POST",
 			body: data,
 		}
@@ -23,7 +23,7 @@ async function tagging(data) {
 	const response = await fetch(
 		"https://api-inference.huggingface.co/models/facebook/detr-resnet-50-dc5",
 		{
-			headers: { Authorization: "Bearer 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" },
+			headers: { Authorization: "Bearer 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" },
 			method: "POST",
 			body: data,
 		}
@@ -37,7 +37,7 @@ async function query(data) {
 	const response = await fetch(
 		"https://api-inference.huggingface.co/models/Helsinki-NLP/opus-mt-en-es",
 		{
-			headers: { Authorization: "Bearer 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" },
+			headers: { Authorization: "Bearer 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" },
 			method: "POST",
 			body: JSON.stringify(data)
 		}
@@ -50,7 +50,7 @@ async function getGenero(data) {
 	const response = await fetch(
 		"https://api-inference.huggingface.co/models/dima806/man_woman_face_image_detection",
 		{
-			headers: { Authorization: "Bearer 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" },
+			headers: { Authorization: "Bearer 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" },
 			method: "POST",
 			body: data,
 		}
@@ -63,7 +63,7 @@ async function getEdad(data){
 	const response = await fetch(
 		"https://api-inference.huggingface.co/models/dima806/faces_age_detection",
 		{
-			headers: { Authorization: "Bearer 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" },
+			headers: { Authorization: "Bearer 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" },
 			method: "POST",
 			body: data,
 		}
@@ -155,3 +155,4 @@ exports.descripImagen = onCall((data, response) => {
 		return JSON.stringify(response);
 	});
  });
+ 

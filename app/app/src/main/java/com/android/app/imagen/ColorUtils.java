@@ -59,7 +59,7 @@ public class ColorUtils {
 		colorList.add(new ColorName("Dorado", 0xB8, 0x86, 0x0B));
 		colorList.add(new ColorName("Gris", 0xA9, 0xA9, 0xA9));
 		colorList.add(new ColorName("Verde", 0x00, 0x64, 0x00));
-		colorList.add(new ColorName("Caqui", 0xBD, 0xB7, 0x6B));
+		colorList.add(new ColorName("Rojo", 0xBD, 0xB7, 0x6B));
 		colorList.add(new ColorName("Morado", 0x8B, 0x00, 0x8B));
 		colorList.add(new ColorName("Verde oliva", 0x55, 0x6B, 0x2F));
 		colorList.add(new ColorName("Naranja", 0xFF, 0x8C, 0x00));
