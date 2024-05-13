@@ -39,13 +39,6 @@ El dispositivo debe conceder permisos para instalar aplicaciones de origen exter
 <img src="https://drive.google.com/uc?export=view&id=1Kkh_AbUtj3N8yPZTo3FoBWMthZAKAfE0"
      alt="Demo" width=75% height=75%>
 
-## Diagrama UML
-
-<p align="center">
-<img src="https://drive.google.com/uc?export=view&id=1Nj8sIcWrKyFu4c253rE7EhJu-YLlkVB2"
-     alt="Diagrama" width=35% height=35%>
-</p>
-
 ## Autores
 
 - [@WalidBousnitra](https://www.github.com/WalidBousnitra)
