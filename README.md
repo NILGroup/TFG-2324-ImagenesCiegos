@@ -6,7 +6,7 @@ Aplicación móvil para facilitar la interpretación de imágenes a personas con
 
 ## Documentación
 
-Memoria: desarollo completo donde se incluye la investigación y el desarrollo técnico del proyecto.
+Memoria: desarrollo completo donde se incluye la investigación y el desarrollo técnico del proyecto.
 1. Introducción
  * Motivación
  * Objetivos
